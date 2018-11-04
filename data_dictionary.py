@@ -1,217 +1,282 @@
+""""""
+
+import grouping
 import pandas as pd
-epsilon = 10**-7
+import numpy as np
+
+# TODO: data_dict: Change name of DataDict
+# TODO: data_dict: move all init_variables to setting.py
+# TODO: data_dict: move all possible functions to separate files for each
+# TODO: data_dict: change getter/setters for more intuitive understanding
+# TODO: data_dict: add more checker for datatype/valib numbers/etc
+# TODO: data_dict: add more comments + correct __doc__ strings
+
+# TODO: data_dict\load_data:    unify input
+# TODO: data_dict\load_data:    add ability to read labels from first/last column
+# TODO: data_dict:
 
 
-def load_data(file_path="init_data\\data.csv"):
+class DataDictionary:
 
+    def __init__(self):
+        """init data"""
 
-    data_dict = dict()  # returning data
-    id_num = 0          # identification number of line
-    ids = set()         # set of valid identification numbers
+        # ************* VARIABLES ***************
+        self.metric = 0  # Euclid
 
-    file = open(path + file, mode='r')
-    line = file.readline()
-    print(f"В файле с белым вином: {line.strip()} записей, ")  # DEBUG
+        self.epsilon = 10 ** -7
+        self.file_path = None
 
-    line = file.readline()  # EoF white wine
-    while line:
+        self.df = None
+        self.labels = None
+        self.ids = None
+        self.row_count = None
+        self.col_count = None
+        self.shape = None
+        self.rel = None
+        self.border = None
 
-        frame = []
-        line = line.strip()
-        line = line.strip('"\n')
-        line = line.split()
-        for el in line: frame.append(float(el))
+        self.near_table = None
+        self.link = None
+        self.path = None
 
-        # all data about one line of df
-        data_dict[id_num] = {'id': id_num, 'data': frame}
-        if id_num < 100:
-            data_dict[id_num]['class'] = 0
+        self.shell = None
+        self.groups = None
+        self.ability = None
+        # ************/ VARIABLES /**************
+
+    def load_data(self,
+                  datafile_path="init_data\\skulls.csv",
+                  labelfile_path="init_data\\labels.csv", *_):
+        """loading data set"""
+
+        from numpy import genfromtxt
+
+        self.path = "d:\\_NUU\\2018\\machine\\skulls"
+
+        self.file_path = datafile_path
+        # self.df = pd.read_csv(file_path)
+        self.df = genfromtxt(datafile_path, delimiter=",")
+        self.labels = genfromtxt(labelfile_path, delimiter=",")
+        self.shape = self.df.shape
+        self.row_count = self.shape[0]
+        self.col_count = self.shape[1]
+        self.ids = set(range(self.df.shape[0]))
+
+        self.set_rel_table()
+        self.rel = self.get_rel_table(metric=self.metric)
+
+    def get_rel_table(self, metric=0):
+        """ CREATE RELATIVE TABLE FOR EACH OBJECT ******************************1
+            rel[ id1, id2, ... idm
+            id1,   0, 1.7, ... 12.2
+            ...  ...  ...  ... ...
+            idm  1.2, 1.5, ... 0  ]
+        ******************************************************************** """
+
+        rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
+
+        for host_id in self.ids:
+            line = []
+            for other_idn in self.ids:
+                rel[host_id][other_idn] = self.distance(host_id, other_idn, metric)
+
+        return rel
+
+    def set_rel_table(self, rel_table=None):
+        """set relation table."""
+        if not rel_table:
+            self.rel = self.get_rel_table(self.metric)
         else:
-            data_dict[id_num]['class'] = 1
+            self.rel = rel_table
 
-        ids.add(id_num)
-        id_num += 1
+    def distance(self, host_id, other_id, metric=0):
+        """Calculate distance with honor of metric"""
+        r = 0  # distance
+        if metric == 0:  # euclidean
+            r = sum((self.df[host_id] - self.df[other_id])**2 ) ** 1/2
 
-        line = file.readline()  # EoF white wine
+        return r
 
-    data_dict['feature_names'] = [
-        "feature1",
-        "feature2",
-    ]
+    def get_rel_of(self, host_id, *_, rel_table=None):
+        """Returns: 2d list with like [<r>, <other_id>, <other_class>]
+                r           === distance to other object
+                other_id    === other objects id
+                other_class === other objects class
+        """
 
-    data_dict['ids'] = ids.copy()
+        rel_of = None
+        rel_of = []
+        radiuslist = self.rel[host_id].tolist().copy()
+        for other_id in self.ids:
+            rel_of.append([other_id, radiuslist[other_id], self.labels[other_id]])
 
-    data_dict['rows'] = id_num - 1
+        rel_of = np.array(rel_of)
+        
+        # rel_of = rel_of[ sorted(list(self.ids)) ]
+        own = np.where(rel_of[:, 0] == host_id)
+        rel_of = np.delete(rel_of, (own[0][0]), axis=0)
+        rel_of = rel_of[rel_of[:, 1].argsort()]
+        return rel_of
 
-    data_dict['cols'] = len(data_dict[0]['data'])
+    def set_link(self, link=None):
+        """ CALCULATE K = number of links ***************************************
+            data_dict[<id_number>]            === dict with all data about object
+            data_dict[<id_number>]['link']    === number of border links
+                                                = (для скольких этот объект является граничным)
+        ************************************************************************* """
 
-    data_dict['path'] = path
+        # if link is None:
+        #     self.link = dict()
+        #
+        #     for host_id in self.ids:
+        #         self.link[host_id] = 0
+        #
+        #     for host_id in self.ids:
+        #         near = self.get_rel_of(host_id)
+        #
+        #         for rel_of in near:
+        #             if self.labels[host_id] != rel_of[2]:
+        #                 self.link[int(rel_of[0])] += 1
+        #                 break
+        # else:
+        #     self.link = link
 
-    return data_dict.copy()
+        ...
+        # EoF set_link(self, link=None):
 
-
-def get_rel(data_dictionary=None):
-    """ RELATIVE DICTIONARY CREATING ***************************************
-    data_dict[<id_number>]        === dict with all data about object
-    data_dict[<id_number>]['rel'] === relative dict, it is next structure
-    data_dict[<id_number>]['rel'] === {<id>, <r>}, where 
-                                      <id>  = id number of another obj
-                                      <r>   = distance to another obj
-    ******************************************************************** """
-
-    data_dict = data_dictionary.copy()
-    del data_dictionary
-
-    for id_host in data_dict['ids']:  # viewing obj
-
-        rel_dict = dict()
-        for id_other in data_dict['ids']:  # for checking distance with another obj
-
-            if id_host == id_other:
-                continue
-            else:
-                r = .0  # distance between objects
-                for host_feature, other_feature in \
-                        zip(data_dict[id_host]['data'], data_dict[id_other]['data']):
-                    r += (other_feature - host_feature) ** 2
-
-                r = r ** (1 / 2)
-                rel_dict[id_other] = r
-
-        data_dict[id_host]['rel'] = rel_dict.copy()
-
-    return data_dict.copy()
-
-
-def get_near(data_dict=None):
-    """ GETTING ID AND Radius OF NEAREST OPPONENT *******************************
-        data_dict[<id_number>]                     === dict with all data about object
-        data_dict[<id_number>]['nearest_opponent'] === list with next structure
-        data_dict[<id_number>]['nearest_opponent'] === [0, 1], where 
-                                          <id>       = id number of nearest opponent obj
-                                          <r>        = distance to nearest opponent obj
-        ***************************************************************** """
-
-    for idn in data_dict['ids']:
-        data_dict.pop('nearest_opponent', None)
-
-        # getting all opponent ids
-        # idn_opponents = {x for x in data_dict['ids']
-        #                  if data_dict[x]['class'] != data_dict[idn]['class']}
-
-        # getting id and r of nearest opponent
-        mn = (idn, float('+inf'))
-        for idn_opp in data_dict['ids']:
-
-            if data_dict[idn]['class'] != data_dict[idn_opp]['class']:
-                if mn[1] > data_dict[idn]['rel'][idn_opp]:
-                    mn = (idn_opp, data_dict[idn]['rel'][idn_opp])
-
-            # if found r=0, no necessary to continue search
-            if mn[1] == .0: break
-
-        # write founding data in to obj
-        data_dict[idn]['nearest_opponent'] = mn
-
-    """ CALCULATE K = number of links ***************************************
-        data_dict[<id_number>]            === dict with all data about object
-        data_dict[<id_number>]['link']    === number of border links 
-                                            = (для скольких этот объект является граничным)
-    ************************************************************************* """
-    for idn in data_dict['ids']:
-
-        near = data_dict[idn]['nearest_opponent']
-        if data_dict[near[0]].get('link'):
-            data_dict[near[0]]['link'] += 1
+    def get_link(self, host_id=None):
+        if host_id is None:
+            return self.link.copy()
         else:
-            data_dict[near[0]]['link'] = 1
+            return self.link[host_id]
 
-    return data_dict.copy()  # end of load_data()
+    # /end/ def get_link(self, host_id=None):
 
-
-def get_shell(data_dict=None):
-    """ identify SHELL objects
-
-    :param data_dict:   - data in own dictionary form.
-    :return:            - set of shell obj's id_number
-    """
-
-    if not data_dict:
-        print('Content error')
-        return None
-
-    shell = set()  # ids of shell objects
-    for host_id in data_dict['ids']:
-
-        near = data_dict[host_id]['nearest_opponent']
-        friends = set()
-        for friend_id in data_dict['ids']:
-            if data_dict[host_id]['class'] == data_dict[friend_id]['class'] and \
-                    host_id != friend_id and \
-                    data_dict[host_id]['rel'][friend_id] <= near[1]:
-                friends.add(friend_id)
-
-        min_from_friends = [host_id, near[1]]
-        for friend_id in friends:
-            if min_from_friends[1] > data_dict[friend_id]['rel'][near[0]]:
-                min_from_friends = [friend_id, data_dict[friend_id]['rel'][near[0]]]
-
-        shell.add(min_from_friends[0])
-
-    return shell  # EoF get_shell
-
-
-def get_border(data_dict=None):
-    """ identify BORDER objects
-
-    :param data_dict:   - data in own dictionary form.
-    :return:            - set of border obj's id_number
-    """
-
-    try:
-        border = set()  # ids of border objects
-        for host_id in data_dict['ids']:
-
-            border.add(data_dict[host_id]['nearest_opponent'][0])
-
-        return border.copy()
-    except Exception as e:
-        print(f'data_dict contents not valid data. {e.args}')
-        return set()
-
-
-def get_noise(data_dict=None, border=None):
-    """ identify NOISE objects
+    def get_border(self):
+        """ identify BORDER objects
 
         :param data_dict:   - data in own dictionary form.
-        :param border:      - IDs of border obj
-        :return:            - set of noise obj's id_number
-    """
+        :return:            - set of border obj's id_number
+        """
 
-    if not data_dict or not border:
-        print('Content error')
-        return None
+        self.link = dict()
 
-    noise = set()
+        for host_id in self.ids:
+            self.link[host_id] = 0
 
-    for host_id in border:
-
-        K = data_dict[host_id].get('link')              # number of links to the host_if
-        R = data_dict[host_id]['nearest_opponent'][1]   # length to nearest opponent
-        L = 1                                           # number of friend obj with in R
-
-        for other_id in data_dict['ids']:
-            if data_dict[host_id]['class'] == data_dict[other_id]['class'] and \
-                            host_id != other_id and \
-                            data_dict[host_id]['rel'][other_id] <= R:
-                L += 1
-
+        near = None
         try:
-            # if L == 0 or K/L > 1:
-            if K/L > 1:
-                noise.add(host_id)
-        except Exception as e:
-            print(f"NOISE ERROR:   id:{host_id:4} K={K:3} L={L:3}\t{e.args}")
+            border = set()  # ids of border objects
 
-    return noise.copy()  # EoF get_noise()
+            for host_id in self.ids:  # for each obj
+                near = self.get_rel_of(host_id)  # get relative table of obj
+
+                for rel_of in near:          # looking for opponent on rel_of host_id
+                    if self.labels[host_id] != rel_of[2]:  # opponent found
+                        border.add(int(rel_of[0]))  # add opponent_id into border_dic
+                        self.link[int(rel_of[0])] += 1
+                        break  # stop looking for opponent
+                else:  # if no opponent found
+                    print(f"no opponent found for {host_id}")
+
+            return border.copy()
+
+        except Exception as e:
+            print(f"host_id:{host_id};\tnear:{near};\n")
+                  # f"len near:{self.link}")
+            print(f'data_dict contents not valid data. {e.args}')
+            return set()
+
+    def set_border(self, border=None):
+
+        if border is not None:
+            self.border = border
+        else:
+            self.border = self.get_border()
+
+    def get_noise(self, requested_id=None, border=None):
+        """ identify NOISE objects
+
+            :param data_dict:   - data in own dictionary form.
+            :param border:      - IDs of border obj
+            :return:            - set of noise obj's id_number
+        """
+
+        if border is None:
+            border = self.border
+
+        noise = set()
+
+        if requested_id is None:
+            for host_id in border:
+                K = self.get_link(host_id)
+
+                # Calc L (count of friendly within R = distance to nearest opponent)
+                L = 0
+                near = self.get_rel_of(host_id)
+                for rel_of in near:
+                    if self.labels[host_id] == int(rel_of[2]):
+                        L += 1
+                    else:
+                        break
+
+                try:
+                    if L == 0 or K/L > 1:
+                        noise.add(host_id)
+                except Exception as e:
+                    print(f"NOISE ERROR:   id:{host_id:4} K={K:3} L={L:3}\t{e.args}")
+                    print(f"rel_of({host_id}: {self.get_rel_of(host_id)})")
+        else:
+            host_id = requested_id
+            K = self.get_link(host_id)
+            L = 0
+            near = self.get_rel_of(host_id)
+            for rel_of in near:
+                if self.labels[host_id] == int(rel_of[2]):
+                    L += 1
+                else:
+                    break
+
+            try:
+                if K / L > 1:
+                    return True
+            except Exception as e:
+                print(f"NOISE ERROR:   id:{host_id:4} K={K:3} L={L:3}\t{e.args}")
+
+            return False
+
+        return noise.copy()  # EoF get_noise()
+
+    def get_shell(self):
+        """ identify SHELL objects
+        :param data_dict:   - data in own dictionary form.
+        :return:            - set of shell obj's id_number
+        """
+        import shell_selection
+
+        shell = shell_selection.get_shell(self)
+
+        return shell  # EoF get_shell
+
+    def set_shell(self, shell=None):
+        if shell is None:
+            shell = self.get_shell()
+
+        self.shell = shell
+
+    def set_groups(self, groups=None):
+        import settings as st
+        if groups is None:
+            self.groups = grouping.get_groups(self, st)
+        else:
+            self.groups = groups
+
+    def get_groups(self):
+        return self.groups
+
+    def get_ability(self):
+        import ability
+        self.ability = ability.get_compactness(self)
+        return self.ability
 
