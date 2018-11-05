@@ -41,4 +41,3 @@ def metric(metric_name):
                             f"metric type({metric_name}) is {type(metric_name)}")
 
     return 1
-
