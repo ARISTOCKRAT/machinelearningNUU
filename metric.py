@@ -21,7 +21,7 @@ Metrics intended for real-valued vector spaces:
 """
 
 
-def distance(instance, host_id, other_id, metric=None):
+def distance(instance, host_id, other_id, metric=None, *, p=2):
 
     metric = validator.metric(metric)
 
@@ -32,7 +32,7 @@ def distance(instance, host_id, other_id, metric=None):
     elif metric == 3:
         return __manhattan_distance(instance, host_id, other_id)
     elif metric == 4:
-        return __manhattan_distance(instance, host_id, other_id)
+        return __minkowski_distance(instance, host_id, other_id, p)
 
 
 def __euclidean_distance(instance, host_id, other_id):
@@ -47,7 +47,33 @@ def __euclidean_distance(instance, host_id, other_id):
 
     r = None
     try:
-        r = sum((instance.df[host_id] - instance.df[other_id]) ** 2) ** 1 / 2
+        r = sum((instance.df[host_id] - instance.df[other_id]) ** 2) ** .5
+    except Exception as e:
+        import error_handler
+        s = f"ERROR:\t on calculate distance:: Euclidean ::" \
+            f"\n\thost_id:({host_id}); other_id:{other_id}; error:{e.args}"
+        error_handler.write(s)
+    return r
+
+
+def __minkowski_distance(instance, host_id, other_id, p):
+    """
+    Calculates distance btw 2 obj using Minkowski's metric sys
+
+    :param instance:        # instance of DataDictionary for extracting obj features
+    :param host_id:         # identifier of obj1
+    :param other_id:        # identifier of obj2
+    :return:                # distance btw obj1 & obj2
+    """
+
+    r = None
+    print(f"host:{instance.df[host_id]}; oth:{instance.df[other_id]}; p={p}")
+    try:
+        r = sum(
+            abs(
+                instance.df[host_id] - instance.df[other_id]
+               ) ** p
+               ) ** (1 / p)
     except Exception as e:
         import error_handler
         s = f"ERROR:\t on calculate distance:: Euclidean ::" \
