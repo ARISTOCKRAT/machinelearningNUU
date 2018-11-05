@@ -5,6 +5,7 @@ There we will calculate distance
 # TODO: metric:     move distance function to this file
 # TODO: metric:     add at least 7 top metrics
 
+
 import validator
 import settings
 
@@ -12,11 +13,11 @@ import settings
 Metrics intended for real-valued vector spaces:
 
   identifier	        class name	        args	        distance function
-1 “euclidean”	        EuclideanDistance	                sqrt(sum((x - y)^2))
-2 “manhattan”	        ManhattanDistance                   sum(|x - y|)
-3 “chebyshev”	        ChebyshevDistance                   max(|x - y|)
-4 “minkowski”	        MinkowskiDistance	p	            sum(|x - y|^p)^(1/p)
-5 “wminkowski”	        WMinkowskiDistance	p, w	        sum(|w * (x - y)|^p)^(1/p)
++ “euclidean”	        EuclideanDistance	                sqrt(sum((x - y)^2))
++ “manhattan”	        ManhattanDistance                   sum(|x - y|)
++ “chebyshev”	        ChebyshevDistance                   max(|x - y|)
++ “minkowski”	        MinkowskiDistance	p	            sum(|x - y|^p)^(1/p)
++ “wminkowski”	        WMinkowskiDistance	p, w	        sum(|w * (x - y)|^p)^(1/p)
 6 “seuclidean”	        SEuclideanDistance	V	            sqrt(sum((x - y)^2 / V))
 7 “mahalanobis”	        MahalanobisDistance	V or VI	        sqrt((x - y)' V^-1 (x - y))
 """
@@ -137,4 +138,5 @@ def __manhattan_distance(instance, host_id, other_id):
 
 if __name__ == '__main__':
     ...
+>>>>>>> Stashed changes
 
