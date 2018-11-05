@@ -28,7 +28,11 @@ def distance(instance, host_id, other_id, metric=None):
     if metric == 1:
         return __euclidean_distance(instance, host_id, other_id)
     elif metric == 2:
-        return 1
+        return __chebyshev_distance(instance, host_id, other_id)
+    elif metric == 3:
+        return __manhattan_distance(instance, host_id, other_id)
+    elif metric == 4:
+        return __manhattan_distance(instance, host_id, other_id)
 
 
 def __euclidean_distance(instance, host_id, other_id):
@@ -70,6 +74,29 @@ def __chebyshev_distance(instance, host_id, other_id):
     except Exception as e:
         import error_handler
         s = f"ERROR:\t on calculate distance:: __chebyshev_distance ::" \
+            f"\n\thost_id:({host_id}); other_id:{other_id}; error:{e.args}"
+        error_handler.write(s)
+    return r
+
+
+def __manhattan_distance(instance, host_id, other_id):
+    """
+    Calculates distance btw 2 obj using Manhattan metric sys
+
+    :param instance:        # instance of DataDictionary for extracting obj features
+    :param host_id:         # identifier of obj1
+    :param other_id:        # identifier of obj2
+    :return:                # distance btw obj1 & obj2
+    """
+
+    r = None
+    try:
+        x = instance.df[host_id]
+        y = instance.df[other_id]
+        return sum(abs(x - y))
+    except Exception as e:
+        import error_handler
+        s = f"ERROR:\t on calculate distance:: __manhattan_distance ::" \
             f"\n\thost_id:({host_id}); other_id:{other_id}; error:{e.args}"
         error_handler.write(s)
     return r

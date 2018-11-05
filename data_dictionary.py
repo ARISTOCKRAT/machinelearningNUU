@@ -6,6 +6,7 @@ import numpy as np
 
 import settings
 import validator
+import metric as metriclib
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -77,13 +78,9 @@ class DataDictionary(settings.DataDictionarySettings):
         else:
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, metric=0):
-        """Calculate distance with honor of metric"""
-        r = 0.  # distance
-        if metric == 0:  # euclidean
-            r = sum((self.df[host_id] - self.df[other_id])**2 ) ** 1/2
+    def distance(self, host_id, other_id, metric=None):
 
-        return r
+        return metriclib.distance(self, host_id, other_id, metric)
 
     def get_rel_of(self, host_id, *_, rel_table=None):
         """Returns: 2d list with like [<r>, <other_id>, <other_class>]
