@@ -4,6 +4,8 @@ import grouping
 import pandas as pd
 import numpy as np
 
+import settings
+
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
 # TODO: data_dict: move all possible functions to separate files for each
@@ -16,34 +18,14 @@ import numpy as np
 # TODO: data_dict:
 
 
-class DataDictionary:
+class DataDictionary(settings.DataDictionarySettings):
 
     def __init__(self):
         """init data"""
+        super(DataDictionary, self).__init__()
 
         # ************* VARIABLES ***************
-        self.metric = 0  # Euclid
-
-        self.epsilon = 10 ** -7
-        self.file_path = None
-
-        self.df = None
-        self.labels = None
-        self.ids = None
-        self.row_count = None
-        self.col_count = None
-        self.shape = None
-        self.rel = None
-        self.border = None
-
-        self.near_table = None
-        self.link = None
-        self.path = None
-
-        self.shell = None
-        self.groups = None
-        self.ability = None
-        # ************/ VARIABLES /**************
+        # ************/ VARIABLES /************** #
 
     def load_data(self,
                   datafile_path="init_data\\skulls.csv",
@@ -66,8 +48,8 @@ class DataDictionary:
         self.set_rel_table()
         self.rel = self.get_rel_table(metric=self.metric)
 
-    def get_rel_table(self, metric=0):
-        """ CREATE RELATIVE TABLE FOR EACH OBJECT ******************************1
+    def get_rel_table(self, metric=None):
+        """ CREATE RELATIVE TABLE FOR EACH OBJECT ******************************
             rel[ id1, id2, ... idm
             id1,   0, 1.7, ... 12.2
             ...  ...  ...  ... ...
@@ -83,8 +65,14 @@ class DataDictionary:
 
         return rel
 
-    def set_rel_table(self, rel_table=None):
-        """set relation table."""
+    def set_rel_table(self, *_, rel_table=None, metric=None):
+        """
+        :param rel_table:      # rel_table with which you want replace self.rel_table
+        :param metric:         # by default Euclidean
+        :return:               # None
+        """
+        if metric is None:
+
         if not rel_table:
             self.rel = self.get_rel_table(self.metric)
         else:
