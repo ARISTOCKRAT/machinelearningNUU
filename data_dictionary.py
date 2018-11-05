@@ -78,9 +78,9 @@ class DataDictionary(settings.DataDictionarySettings):
         else:
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, metric=None, *, p=2):
+    def distance(self, host_id, other_id, metric=None, *, p=2, w=1):
 
-        return metriclib.distance(self, host_id, other_id, metric, p=p)
+        return metriclib.distance(self, host_id, other_id, metric, p=p, w=w)
 
     def get_rel_of(self, host_id, *_, rel_table=None):
         """Returns: 2d list with like [<r>, <other_id>, <other_class>]

@@ -6,6 +6,7 @@ There we will calculate distance
 # TODO: metric:     add at least 7 top metrics
 
 import validator
+import settings
 
 """
 Metrics intended for real-valued vector spaces:
@@ -21,18 +22,24 @@ Metrics intended for real-valued vector spaces:
 """
 
 
-def distance(instance, host_id, other_id, metric=None, *, p=2):
+def distance(instance, host_id, other_id, metric=None, *, p=2, w=1):
 
     metric = validator.metric(metric)
 
-    if metric == 1:
+    if settings.metric.metric_dict[metric] == 'euclidean':
         return __euclidean_distance(instance, host_id, other_id)
-    elif metric == 2:
+
+    elif settings.metric.metric_dict[metric] == 'chebyshev':
         return __chebyshev_distance(instance, host_id, other_id)
-    elif metric == 3:
+
+    elif settings.metric.metric_dict[metric] == 'manhattan':
         return __manhattan_distance(instance, host_id, other_id)
-    elif metric == 4:
-        return __minkowski_distance(instance, host_id, other_id, p)
+
+    elif settings.metric.metric_dict[metric] == 'minkowski':
+        return __minkowski_distance(instance, host_id, other_id, p, w)
+
+    elif settings.metric.metric_dict[metric] == 'wminkowski':
+        return __minkowski_distance(instance, host_id, other_id, p, w)
 
 
 def __euclidean_distance(instance, host_id, other_id):
@@ -56,7 +63,7 @@ def __euclidean_distance(instance, host_id, other_id):
     return r
 
 
-def __minkowski_distance(instance, host_id, other_id, p):
+def __minkowski_distance(instance, host_id, other_id, p, w):
     """
     Calculates distance btw 2 obj using Minkowski's metric sys
 
@@ -71,7 +78,7 @@ def __minkowski_distance(instance, host_id, other_id, p):
     try:
         r = sum(
             abs(
-                instance.df[host_id] - instance.df[other_id]
+                w * (instance.df[host_id] - instance.df[other_id])
                ) ** p
                ) ** (1 / p)
     except Exception as e:
