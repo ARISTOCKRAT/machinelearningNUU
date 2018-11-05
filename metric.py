@@ -2,8 +2,9 @@
 There we will calculate distance
 """
 
-# TODO: metric:     move distance function to this file
-# TODO: metric:     add at least 7 top metrics
+# done: metric:     move distance function to this file
+# done: metric:     add at least 7 top metrics
+# TODO: metric:     add new popular metrics
 
 
 import validator
@@ -138,5 +139,4 @@ def __manhattan_distance(instance, host_id, other_id):
 
 if __name__ == '__main__':
     ...
->>>>>>> Stashed changes
 
