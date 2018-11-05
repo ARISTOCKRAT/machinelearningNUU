@@ -2,6 +2,7 @@
 import error_handler
 
 
+# validate the metric value
 def metric(metric_name):
     import settings
 
@@ -45,3 +46,10 @@ def metric(metric_name):
 
     return settings.metric.default_metric
 
+
+# validate the rel table size etc
+def rel_table(rel_table_obj):
+    import numpy as np
+
+    if type(rel_table_obj) is not np.array:
+        return None

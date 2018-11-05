@@ -16,7 +16,7 @@ class DataDictionarySettings:
 
     def __init__(self):
         # default metric
-        self.metric = 1 # "euclidean"  # Euclid
+        self.metric = 1  # "euclidean"  # Euclid
 
         # limit of diff in float data
         self.epsilon = 10 ** -7
@@ -49,10 +49,10 @@ class DataDictionarySettings:
         #     7  1.5      0     # 2nd nearest obj
         #     9  1.59     1     # 3rd nearest obj
         #     ...   ...
-        self.rel_of = {"id": 0, "radius": 1, "class": 2}
+        # self.rel_of = {"id": 0, "radius": 1, "class": 2}
 
         # delimiter
-        self.load_data = {"delimiter": ","}
+        # self.load_data = {"delimiter": ","}
 
 
 class ErrorHandler:

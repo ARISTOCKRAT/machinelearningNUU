@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 import settings
+import validator
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -29,7 +30,9 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def load_data(self,
                   datafile_path="init_data\\skulls.csv",
-                  labelfile_path="init_data\\labels.csv", *_):
+                  labelfile_path="init_data\\labels.csv",
+                  *,
+                  metric=None):
         """loading data set"""
 
         from numpy import genfromtxt
@@ -37,7 +40,6 @@ class DataDictionary(settings.DataDictionarySettings):
         self.path = "d:\\_NUU\\2018\\machine\\skulls"
 
         self.file_path = datafile_path
-        # self.df = pd.read_csv(file_path)
         self.df = genfromtxt(datafile_path, delimiter=",")
         self.labels = genfromtxt(labelfile_path, delimiter=",")
         self.shape = self.df.shape
@@ -49,12 +51,9 @@ class DataDictionary(settings.DataDictionarySettings):
         self.rel = self.get_rel_table(metric=self.metric)
 
     def get_rel_table(self, metric=None):
-        """ CREATE RELATIVE TABLE FOR EACH OBJECT ******************************
-            rel[ id1, id2, ... idm
-            id1,   0, 1.7, ... 12.2
-            ...  ...  ...  ... ...
-            idm  1.2, 1.5, ... 0  ]
-        ******************************************************************** """
+
+        # validate
+        metric = validator.metric(metric)
 
         rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
 
@@ -71,7 +70,7 @@ class DataDictionary(settings.DataDictionarySettings):
         :param metric:         # by default Euclidean
         :return:               # None
         """
-        if metric is None:
+        metric = validator.metric(metric)
 
         if not rel_table:
             self.rel = self.get_rel_table(self.metric)
@@ -80,7 +79,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def distance(self, host_id, other_id, metric=0):
         """Calculate distance with honor of metric"""
-        r = 0  # distance
+        r = 0.  # distance
         if metric == 0:  # euclidean
             r = sum((self.df[host_id] - self.df[other_id])**2 ) ** 1/2
 
