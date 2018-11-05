@@ -60,7 +60,13 @@ class ErrorHandler:
 
 
 class metric:
+    default_metric = 1
     metric_dict = {
         1: "euclidean",
-        2: "manhattan"
+        2: "manhattan",
+        3: "chebyshev",
+        4: "minkowski",
+        5: "wminkowski",
+        6: "seuclidean",
+        7: "mahalanobis"
     }
