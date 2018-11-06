@@ -8,8 +8,8 @@ def metric(metric_name):
 
     if metric_name:
         if type(metric_name) is int:
-            if metric_name < 1 or metric_name > 7:
-                error_handler.write(f"ERROR:\t out of range:: continue working as default::"
+            if settings.metric.metric_dict.get(metric_name) is None:
+                error_handler.write(f"ERROR:\t unresolved metric_name:: continue working as default::"
                                     f"\n\tmetric type({metric_name}) is {type(metric_name)}")
                 return settings.metric.default_metric
             else:
