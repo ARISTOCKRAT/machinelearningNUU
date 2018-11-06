@@ -7,6 +7,7 @@ import numpy as np
 import settings
 import validator
 import metric as metriclib
+import border_selection
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -138,6 +139,12 @@ class DataDictionary(settings.DataDictionarySettings):
     # /end/ def get_link(self, host_id=None):
 
     def get_border(self):
+        border, link = border_selection.get_border(self)
+        self.link = link
+        return border
+
+    '''
+    def get_border(self):
         """ identify BORDER objects
 
         :param data_dict:   - data in own dictionary form.
@@ -171,6 +178,7 @@ class DataDictionary(settings.DataDictionarySettings):
                   # f"len near:{self.link}")
             print(f'data_dict contents not valid data. {e.args}')
             return set()
+    '''
 
     def set_border(self, border=None):
 

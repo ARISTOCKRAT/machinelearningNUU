@@ -66,7 +66,7 @@ class metric:
         2: "manhattan",
         3: "chebyshev",
         4: "minkowski",
-        5: "wminkowski",
+        # 5: "wminkowski",
         # 6: "seuclidean",
         # 7: "mahalanobis"
     }
