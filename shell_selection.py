@@ -37,6 +37,7 @@ def get_shell(instance=None):
                 break
             else:
                 friends.add(int(row[0]))
+        friends.add(host_id)
 
         file.write(f":: f.len = {len(friends)} id,R,class={near}"
                    f"friends: len={len(friends)} {friends}::\n")

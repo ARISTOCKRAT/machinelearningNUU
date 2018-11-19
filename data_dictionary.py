@@ -8,6 +8,7 @@ import settings
 import validator
 import metric as metriclib
 import border_selection
+import error_handler
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -103,6 +104,24 @@ class DataDictionary(settings.DataDictionarySettings):
         rel_of = np.delete(rel_of, (own[0][0]), axis=0)
         rel_of = rel_of[rel_of[:, 1].argsort()]
         return rel_of
+
+    def get_nearest_opponent(self, host_id, *_, rel_table=None):
+            """Returns: list like [<r>, <opponent_id>, <opponent_class>]
+                    r              === distance to other object
+                    opponent_id    === other objects id
+                    opponent_class === other objects class
+            """
+
+            rel_of = self.get_rel_of(host_id)
+
+            for row in rel_of:
+                if self.labels[host_id] != row[2]:
+                    return row
+            else:
+                s = f"ERROR:     dd.get_nearest_opponent(host_id={host_id})\n" \
+                    f"\tnearest_opponent not found:: rel_of({host_id})={rel_of}"
+                error_handler.write(s)
+            return None
 
     def set_link(self, link=None):
         """ CALCULATE K = number of links ***************************************

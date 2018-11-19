@@ -1,0 +1,137 @@
+"""
+Here would be standart obj selection methods
+"""
+
+
+def get_standart(instance, groups):
+
+    # DEBUG
+    _log = open(r"d:\_NUU\2018\machine\skulls\output_data\standart_selection.log",
+                mode='a+')
+    import datetime
+    s = str(datetime.datetime.now()) + '\n'
+    s += f"init_data:: groups: {groups}\n"
+    _log.write(s)
+
+
+    # sorting groups by their length. It is IMPORTANT
+    # BC this grands us the only solution
+    groups_list = list(groups.values())
+    groups_list.sort(key=len, reverse=True)  # largest to smallest
+
+    group_etalons_list = []
+    # WORKING IN EACH GROUP SEPARATELY
+    for group in groups_list:
+        s = f"\n\n" \
+            f"choose group:: {group}"
+        _log.write(s)
+
+        # declare all obj in group as etalons
+        group_etalons = group.copy()
+
+        # create indent for each element
+        indent = list()  # For list of elements ordered by R to nearest_opponent
+
+        for host_id in group:
+            # indent[ <id>, <R> <etalon> ] :
+            #         <id>     - id of group element;
+            #         <R>      - R to nearest_element;  # for sorting
+            #         <etalon> - is this obj etalon?
+            indent.append([
+                host_id,
+                instance.get_nearest_opponent(host_id)[1],
+                1
+            ])
+
+        # Sorting all elements by R to nearest_opponent
+        indent = sorted(indent, key=lambda x: x[1], reverse=False)
+
+        # working in each ELEMENT of GROUP
+        for n, item in enumerate(indent):
+
+            # temporary delete from group_etalons  # indent[n][2] = 0
+            print(f"del [{item[0]}]", end="\t")
+            group_etalons.discard(item[0])
+
+            # CHECK for errors on change etalon_label
+            for notetalon_id in group - group_etalons:
+                relation_table = []
+                for other_id in dd['ids'] - \
+                                (group - group_etalons) - \
+                                {notetalon_id, }:
+                    # other_id: any, except notetalon objects
+                    relation_table.append([  #
+                        other_id,  # id
+                        dd[notetalon_id]['rel'][other_id],  # R to other_id
+                    ])
+                minimum = min(relation_table, key=lambda x: x[1])
+
+                if dd[notetalon_id]['class'] != dd[minimum[0]]['class']:
+                    print(
+                        f"ERROR: n{n} NotEtalon{notetalon_id}, "
+                        f"minimum{minimum}", end='\t')
+                    group_etalons.add(item[0])
+                else:
+                    print('!', end='')
+
+        group_etalons_list.append(group_etalons)
+        print(f"\nGROUP ETALONS: {group_etalons}")
+
+
+"""
+def get_standart(groups):    
+    # ordered_list = []
+    # WORKING IN EACH GROUP SEPARATELY
+    group_etalons_list = []
+    for group in groups_list:
+    
+        group_etalons = group.copy()
+    
+        ordered_list = list()  # For list of elements ordered by R to nearest_opponent
+        for host_id in group:
+            #  ordered_list[ <id>, <R> <etalon> ] :
+            #                <id>     - id of group element;
+            #                <R>      - R to nearest_element;  # for sorting
+            #                <etalon> - is this obj etalon?
+            ordered_list.append([
+                host_id,
+                dd[host_id]['nearest_opponent'][1],
+                1
+            ])
+    
+        # Sorting all elements by R to nearest_opponent
+        ordered_list = sorted(ordered_list, key=lambda x: x[1], reverse=False)
+    
+        # WORKING ON EACH ELEMENT OF GROUP
+        for n, item in enumerate(ordered_list):
+    
+            # temporary delete from group_etalons  # ordered_list[n][2] = 0
+            print(f"del [{item[0]}]", end="\t")
+            group_etalons.discard(item[0])
+    
+            # CHECK for errors on change etalon_label
+            for notetalon_id in group - group_etalons:
+                relation_table = []
+                for other_id in dd['ids'] - \
+                                (group - group_etalons) - \
+                                {notetalon_id, }:
+                    # other_id: any, except notetalon objects
+                    relation_table.append([  #
+                        other_id,  # id
+                        dd[notetalon_id]['rel'][other_id],  # R to other_id
+                    ])
+                minimum = min(relation_table, key=lambda x: x[1])
+    
+                if dd[notetalon_id]['class'] != dd[minimum[0]]['class']:
+                    print(
+                        f"ERROR: n{n} NotEtalon{notetalon_id}, "
+                        f"minimum{minimum}", end='\t')
+                    group_etalons.add(item[0])
+                else:
+                    print('!', end='')
+    
+        group_etalons_list.append(group_etalons)
+        print(f"\nGROUP ETALONS: {group_etalons}")
+
+"""
+

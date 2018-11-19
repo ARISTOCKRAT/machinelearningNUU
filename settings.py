@@ -49,7 +49,7 @@ class DataDictionarySettings:
         #     7  1.5      0     # 2nd nearest obj
         #     9  1.59     1     # 3rd nearest obj
         #     ...   ...
-        # self.rel_of = {"id": 0, "radius": 1, "class": 2}
+        rel_of = {"id": 0, "radius": 1, "class": 2}
 
         # delimiter
         # self.load_data = {"delimiter": ","}
