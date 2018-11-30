@@ -85,9 +85,9 @@ class DataDictionary(settings.DataDictionarySettings):
         return metriclib.distance(self, host_id, other_id, metric, p=p, w=w)
 
     def get_rel_of(self, host_id, *_, rel_table=None):
-        """Returns: 2d list with like [<r>, <other_id>, <other_class>]
-                r           === distance to other object
+        """Returns: 2d list with like [<other_id>, <r>, <other_class>]
                 other_id    === other objects id
+                r           === distance to other object
                 other_class === other objects class
         """
 
@@ -290,4 +290,8 @@ class DataDictionary(settings.DataDictionarySettings):
         import ability
         self.ability = ability.get_compactness(self)
         return self.ability
+
+    def get_standard(self, groups):
+        import standart_selection
+        return standart_selection.get_standart(self, groups)
 

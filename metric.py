@@ -5,6 +5,7 @@ There we will calculate distance
 # done: metric:     move distance function to this file
 # done: metric:     add at least 7 top metrics
 # TODO: metric:     add new popular metrics
+# TODO: metric:     fix, select def metric (не выбирается по умолчанию)
 
 
 import validator
