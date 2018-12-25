@@ -77,7 +77,7 @@ def get_standart(instance, groups):
                 # minimum = min(relation_table, key=lambda x: x[1])
                 rel_of_notetalon_id = instance.get_rel_of(notetalon_id)
 
-                kNN_k = 5  # TODO: READ FROM SETTINGS
+                kNN_k = 1  # TODO: READ FROM SETTINGS
                 opponent_counter = friend_counter = 0
                 tmp_etalons = instance.ids - notetalons
 
@@ -93,6 +93,8 @@ def get_standart(instance, groups):
                             opponent_counter += 1
                     else:
                         continue
+                    if friend_counter + opponent_counter > kNN_k:
+                        break
 
                 s = f"\nfriend_counter={friend_counter}; opponnt_counter={opponent_counter}"
                 _log.write(s)
@@ -112,8 +114,12 @@ def get_standart(instance, groups):
                     _log.write(s)
 
         etalons_list.append(group_etalons)
-    return etalons_list
-
+    # DEBUG
+    etalons_set = set()
+    for etal in etalons_list:
+        etalons_set = etalons_set | etal
+    # return etalons_list
+    return etalons_set
 
 
 '''

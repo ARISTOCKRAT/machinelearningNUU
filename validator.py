@@ -3,49 +3,60 @@ import error_handler
 
 
 # validate the metric value
-def metric(metric_name):
-    import settings
+def metric(metric_name, st):
+    # done: use st from DD, don't import
+    # import settings
 
     if metric_name:
+
+        # INT
         if type(metric_name) is int:
-            if settings.metric.metric_dict.get(metric_name) is None:
+            if st.metric.metric_dict.get(metric_name) is None:
                 error_handler.write(f"ERROR:\t unresolved metric_name:: continue working as default::"
                                     f"\n\tmetric type({metric_name}) is {type(metric_name)}")
-                return settings.metric.default_metric
+                return st.metric.default_metric
             else:
                 return metric_name
+
+        # FLOAT
         elif type(metric_name) is float:
-            metric(int(metric_name))
+            return metric(int(metric_name), st)
+
+        # STR
         elif type(metric_name) is str:
             metric_name = metric_name.lower()
-            for item in settings.metric.metric_dict.items():
+            # for item in settings.metric.metric_dict.items():
+            for item in st.metric.metric_dict.items():
                 if metric_name == item[1]:
                     return item[0]
-            else:
+            else:  # if no matches
                 error_handler.write(f"ERROR:\t out of range:: continue working as default::"
                                     f"\n\tmetric type({metric_name}) is {type(metric_name)}")
-                return settings.metric.default_metric
+                return st.metric.default_metric
 
-        elif type(metric_name) is list or type(metric_name) is tuple:
-            metric(metric_name[0])
+        # LIST or TUPLE
+        elif (type(metric_name) is list or type(metric_name) is tuple) and metric_name:
+            return metric(metric_name[0], st)
+
+        # DICT or SET
         elif type(metric_name) is dict:
             for el in metric_name.items():
-                return metric(el[1])
+                return metric(el[1], st)
         elif type(metric_name) is set:
             for el in metric_name:
-                return metric(el)
+                return metric(el, st)
+
+        # UNKNOWN type of value
         else:
             error_handler.write(f"ERROR:\t unresolved type of value::\n\t"
                                 f"metric type({metric_name}) is {type(metric_name)}")
     else:
         if metric_name is None:
-            import settings
-            return settings.metric.default_metric
+            return st.metric.default_metric
         error_handler.write(f"ERROR:\t invalid value:: continue working as default::\n\t"
                             f"metric type({metric_name}) is {type(metric_name)}")
 
-    return settings.metric.default_metric
-
+    return st.metric.default_metric
 
 # validate the rel table size etc
 def rel_table(rel_table_obj):

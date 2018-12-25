@@ -70,3 +70,25 @@ class metric:
         # 6: "seuclidean",
         # 7: "mahalanobis"
     }
+
+
+class MetricClass:
+    default_metric = 1
+    metric_dict = {
+        1: "euclidean",
+        2: "manhattan",
+        3: "chebyshev",
+        4: "minkowski",
+        # 5: "wminkowski",
+        # 6: "seuclidean",
+        # 7: "mahalanobis"
+    }
+    p = 2
+    w = 1  # TODO: must be a n-size vector; n = features count
+
+
+class AllSettings:
+
+    def __init__(self):
+        self.metric = MetricClass()
+

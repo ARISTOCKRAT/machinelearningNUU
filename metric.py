@@ -25,7 +25,13 @@ Metrics intended for real-valued vector spaces:
 """
 
 
-def distance(instance, host_id, other_id, metric=None, *, p=2, w=1):
+# rel_table WILL NOT PROVIDE as arg
+# def distance(instance, host_id, other_id, metric=None, *, p=2, w=1, rel_table=None, rel_table=None):
+def distance(instance, host_id, other_id, metric=None, *, p=2, w=1, rel_table=None):
+
+    # TODO: +add rel_table validator
+    # if rel_table is None:
+    rel_table = instance.rel
 
     metric = validator.metric(metric)
 
@@ -38,9 +44,11 @@ def distance(instance, host_id, other_id, metric=None, *, p=2, w=1):
     elif settings.metric.metric_dict[metric] == 'manhattan':
         return __manhattan_distance(instance, host_id, other_id)
 
+    # w - MUST BE A VECTOR ??
     elif settings.metric.metric_dict[metric] == 'minkowski':
         return __minkowski_distance(instance, host_id, other_id, p, w)
 
+    # w - MUST BE A VECTOR ??
     elif settings.metric.metric_dict[metric] == 'wminkowski':
         return __minkowski_distance(instance, host_id, other_id, p, w)
 

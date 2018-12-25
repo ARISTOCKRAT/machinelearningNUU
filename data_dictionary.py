@@ -16,6 +16,7 @@ import error_handler
 # TODO: data_dict: change getter/setters for more intuitive understanding
 # TODO: data_dict: add more checker for datatype/valib numbers/etc
 # TODO: data_dict: add more comments + correct __doc__ strings
+# TODO: data_dict: create UPGRADE func additional to getter/setter
 
 # TODO: data_dict\load_data:    unify input
 # TODO: data_dict\load_data:    add ability to read labels from first/last column
@@ -28,6 +29,8 @@ class DataDictionary(settings.DataDictionarySettings):
         """init data"""
         super(DataDictionary, self).__init__()
 
+        self.st = settings.AllSettings()
+
         # ************* VARIABLES ***************
         # ************/ VARIABLES /************** #
 
@@ -35,7 +38,7 @@ class DataDictionary(settings.DataDictionarySettings):
                   datafile_path="init_data\\skulls.csv",
                   labelfile_path="init_data\\labels.csv",
                   *,
-                  metric=None):
+                  metric=1):
         """loading data set"""
 
         from numpy import genfromtxt
@@ -50,39 +53,65 @@ class DataDictionary(settings.DataDictionarySettings):
         self.col_count = self.shape[1]
         self.ids = set(range(self.df.shape[0]))
 
-        self.set_rel_table()
-        self.rel = self.get_rel_table(metric=self.metric)
+        self.set_rel_table(metric=metric)
+        # self.rel = self.get_rel_table(metric=self.metric)  # set is enough
 
-    def get_rel_table(self, metric=None):
+    def get_rel_table(self, metric=1, *_, rel_table=None, recreate=False):
 
+        if recreate:
+
+            self.create_rel_table(metric=metric, p=2, w=1)
+            # validate
+            metric = validator.metric(metric)
+
+            rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
+
+            for host_id in self.ids:
+                line = []
+                for other_idn in self.ids:
+                    rel[host_id][other_idn] = \
+                        self.distance(host_id, other_idn, metric=metric, rel_table=rel_table)
+
+        return rel
+
+    def create_rel_table(self, metric=1, *_, p=None, w=None):
         # validate
         metric = validator.metric(metric)
 
-        rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
+        # create a shape of relations table
+        rel = np.zeros((self.row_count, self.row_count))
 
         for host_id in self.ids:
             line = []
             for other_idn in self.ids:
-                rel[host_id][other_idn] = self.distance(host_id, other_idn, metric)
+                rel[host_id][other_idn] = \
+                    self.distance(host_id, other_idn, metric=metric, p=p, w=p)
 
-        return rel
+        self.rel = rel
 
-    def set_rel_table(self, *_, rel_table=None, metric=None):
+    def set_rel_table(self, *_, rel_table=None, metric=1):
         """
         :param rel_table:      # rel_table with which you want replace self.rel_table
-        :param metric:         # by default Euclidean
+        :param metric:         # by default 1 ==> Euclidean
         :return:               # None
         """
         metric = validator.metric(metric)
 
-        if not rel_table:
-            self.rel = self.get_rel_table(self.metric)
+        if rel_table is None:
+            self.rel = self.get_rel_table(metric=metric, p=2, w=1, recteate=True)
         else:
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, metric=None, *, p=2, w=1):
+    def distance(self, host_id, other_id, *, metric=None, p=2, w=1, rel_table=None):
 
-        return metriclib.distance(self, host_id, other_id, metric, p=p, w=w)
+        if rel_table is None:
+            return metriclib.distance(
+                self, host_id, other_id, metric, p=p, w=w, rel_table=rel_table
+            )
+        else:
+            return metriclib.distance(
+                self, host_id, other_id, metric, p=p, w=w
+            )
 
     def get_rel_of(self, host_id, *_, rel_table=None):
         """Returns: 2d list with like [<other_id>, <r>, <other_class>]
@@ -93,12 +122,17 @@ class DataDictionary(settings.DataDictionarySettings):
 
         rel_of = None
         rel_of = []
-        radiuslist = self.rel[host_id].tolist().copy()
+
+        if rel_table is None:
+            radiuslist = self.rel[host_id].tolist().copy()
+        else:
+            radiuslist = rel_table[host_id].tolist().copy()
+
         for other_id in self.ids:
             rel_of.append([other_id, radiuslist[other_id], self.labels[other_id]])
 
         rel_of = np.array(rel_of)
-        
+
         # rel_of = rel_of[ sorted(list(self.ids)) ]
         own = np.where(rel_of[:, 0] == host_id)
         rel_of = np.delete(rel_of, (own[0][0]), axis=0)
@@ -277,9 +311,9 @@ class DataDictionary(settings.DataDictionarySettings):
         self.shell = shell
 
     def set_groups(self, groups=None):
-        import settings as st
+
         if groups is None:
-            self.groups = grouping.get_groups(self, st)
+            self.groups = grouping.get_groups(self, self.st)
         else:
             self.groups = groups
 
