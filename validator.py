@@ -58,9 +58,25 @@ def metric(metric_name, st):
 
     return st.metric.default_metric
 
+
+def metric_pw(p, w, st):
+    """ Here we should check p and w
+
+    :param p:   === p (# minkowski)
+    :param w:   === w (# minkowski, seuclidean)
+    :param st:  === instance of settings
+    :return:    === tuple of 2 elements p, w
+    """
+    # TODO: checker
+    p = st.metric.p
+    w = st.metric.w
+    return p, w
+
+
 # validate the rel table size etc
 def rel_table(rel_table_obj):
     import numpy as np
 
     if type(rel_table_obj) is not np.array:
         return None
+

@@ -58,38 +58,39 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def get_rel_table(self, metric=1, *_, rel_table=None, recreate=False):
 
-        if recreate:
-
-            self.create_rel_table(metric=metric, p=2, w=1)
-            # validate
-            metric = validator.metric(metric)
-
-            rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
-
-            for host_id in self.ids:
-                line = []
-                for other_idn in self.ids:
-                    rel[host_id][other_idn] = \
-                        self.distance(host_id, other_idn, metric=metric, rel_table=rel_table)
-
-        return rel
+        # if recreate:
+        #
+        #     self.create_rel_table(metric=metric, p=2, w=1)
+        #     # validate
+        #     metric = validator.metric(metric)
+        #
+        #     rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
+        #
+        #     for host_id in self.ids:
+        #         line = []
+        #         for other_idn in self.ids:
+        #             rel[host_id][other_idn] = \
+        #                 self.distance(host_id, other_idn, metric=metric, rel_table=rel_table)
+        #
+        # return rel
+        return self.rel
 
     def create_rel_table(self, metric=1, *_, p=None, w=None):
         # validate
-        metric = validator.metric(metric)
+        metric = validator.metric(metric, self.st)
+        p, w = validator.metric_pw(p, w, self.st)
 
         # create a shape of relations table
         rel = np.zeros((self.row_count, self.row_count))
 
         for host_id in self.ids:
-            line = []
             for other_idn in self.ids:
                 rel[host_id][other_idn] = \
                     self.distance(host_id, other_idn, metric=metric, p=p, w=p)
 
         self.rel = rel
 
-    def set_rel_table(self, *_, rel_table=None, metric=1):
+    def set_rel_table(self, *_, rel_table=None, metric=1, p=None, w=None):
         """
         :param rel_table:      # rel_table with which you want replace self.rel_table
         :param metric:         # by default 1 ==> Euclidean
@@ -98,19 +99,20 @@ class DataDictionary(settings.DataDictionarySettings):
         metric = validator.metric(metric)
 
         if rel_table is None:
-            self.rel = self.get_rel_table(metric=metric, p=2, w=1, recteate=True)
+            self.create_rel_table(metric=metric, p=p, w=w)
+            # self.rel = self.get_rel_table(metric=metric, p=2, w=1, recteate=True)
         else:
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, *, metric=None, p=2, w=1, rel_table=None):
+    def distance(self, host_id, other_id, *, metric=None, p=None, w=None, rel_table=None):
 
         if rel_table is None:
             return metriclib.distance(
-                self, host_id, other_id, metric, p=p, w=w, rel_table=rel_table
+                self, host_id, other_id, metric, p=p, w=w
             )
         else:
             return metriclib.distance(
-                self, host_id, other_id, metric, p=p, w=w
+                self, host_id, other_id, metric, p=p, w=w, rel_table=rel_table
             )
 
     def get_rel_of(self, host_id, *_, rel_table=None):
