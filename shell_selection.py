@@ -14,9 +14,9 @@ def get_shell(instance, st):
     border_file.write(str(datetime.datetime.now()))
     border_file.write("\n\n")
 
-    debug_file = open(st.full_path['debug_log'], mode='w')
-    debug_file.write(str(datetime.datetime.now()))
-    debug_file.write('\n\n')
+    shell_file = open(st.full_path['shell_log'], mode='w')
+    shell_file.write(str(datetime.datetime.now()))
+    shell_file.write('\n\n')
 
     error_file = open(st.full_path['error_log'], mode='w')
     error_file.write(str(datetime.datetime.now()))
@@ -28,7 +28,11 @@ def get_shell(instance, st):
     for host_id in instance.ids:
         # DEBUG
         near = instance.get_rel_of(host_id)
-        border_file.write(f":: HOST ID {host_id} data:\n{near}::\n")
+        border_file.write(f"\n:: HOST ID {host_id} near:\nid, R, label\n{near}\n")
+
+        # Пока я не понял зачем определять О(Si), т.к.
+        # Ближайщим к оппоненту может быть объект не входящий в O(Si) НО! его игнорируем
+        # что приводит (ИМХО) к противоречию. TODO: check it!
 
         # forming friendly <O(Si)> objects set
         friends = set()
@@ -41,10 +45,9 @@ def get_shell(instance, st):
                 friends.add(int(row[0]))
         friends.add(host_id)
 
-        border_file.write(f":: f.len = {len(friends)} id,R,class={near}"
-                   f"friends: len={len(friends)} {friends}::\n")
+        border_file.write(f"nearest opponents id:{nearest_opponent_id}; O(Si): len={len(friends)} {friends}. ::\n")
 
-        # Seeking nearest obj to nearest_opponent from host_id friends
+        # Seeking nearest obj to nearest_opponent from host_id's friendzone
         shell_obj = [host_id, float('+inf')]
         # print(f"type: {type(nearest_opponent_id)} -- {nearest_opponent_id}; f:{friends}")
         for other_id in friends:
@@ -52,12 +55,20 @@ def get_shell(instance, st):
                 shell_obj[0] = other_id
                 shell_obj[1] = instance.rel[nearest_opponent_id][other_id]
         shell.add(shell_obj[0])
-        s = f"f_id, \t\th->f, \t\tf->o, \t\tin border?\n"
-        s = f"host_id: {host_id}; opponent:{nearest_opponent_id}; friends:{friends} \n" \
-            f"shell_obj: {shell_obj}" \
-            f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n" \
+
+        # s = f"f_id, \t\th->f, \t\tf->o, \t\tin border?\n"
+        # s = f"host_id: {host_id}; opponent:{nearest_opponent_id}; friends:{friends} \n" \
+        #     f"shell_obj: {shell_obj}" \
+        #     f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n" \
+        #     f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
+        shell_file.write(
+            f"\nhost_id:{host_id}; opponent:{nearest_opponent_id}; shell_id: {shell_obj[0]}; friends:{friends} \n"
+            f"h->o:{instance.rel[host_id][nearest_opponent_id]}; "
+            f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}"
+            f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
+            f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n"
             f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
-        debug_file.write(s)
+        )
 
     return shell
 

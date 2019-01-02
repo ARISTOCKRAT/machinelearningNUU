@@ -107,7 +107,7 @@ class AllSettings:
             'label':        r'\init_data\labels.csv',
             # log path
             'border_log':   r'\output_data\border.log',
-            'debug_log':    r'\output_data\debug.log',
+            'shell_log':    r'\output_data\shell.log',
             'error_log':    r'\output_data\shell4_error.data'
         }
         self.full_path = {
@@ -115,7 +115,7 @@ class AllSettings:
             'dataset': None,
             'label': None,
             'border_log': None,
-            'debug_log': None,
+            'shell_log': None,
             'error_log': None
         }
         self.refactoring_path()
