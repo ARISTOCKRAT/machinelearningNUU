@@ -21,10 +21,10 @@ class DataDictionarySettings:
         # limit of diff in float data
         self.epsilon = 10 ** -7
 
-        # projects path
-        self.file_path = None                                # "d:\\_NUU\\2018\\machine\\skulls"
-        self.datafile_path = None                            # "init_data\\skulls.csv"         #
-        self.labelfile_path = None                           # "init_data\\labels.csv"
+        # project's path
+        # self.file_path = None                                # "d:\\_NUU\\2018\\machine\\skulls"
+        # self.datafile_path = None                            # "init_data\\skulls.csv"         #
+        # self.labelfile_path = None                           # "init_data\\labels.csv"
 
         self.df = None
         self.labels = None
@@ -89,9 +89,45 @@ class MetricClass:
     w = 1  # TODO: must be a n-size vector; n = features count
 
 
+class ShellSelection:
+    ...
+
+
 class AllSettings:
 
     def __init__(self):
         self.metric = MetricClass()
         self.rel_of = Rel_Of()
+
+        # region PATH
+        self.DEFAULT_PATH = {
+            # project path
+            'project':      r'd:\_NUU\2018\machine\skulls',
+            'dataset':      r'\init_data\skulls.csv',
+            'label':        r'\init_data\labels.csv',
+            # log path
+            'border_log':   r'\output_data\border.log',
+            'debug_log':    r'\output_data\debug.log',
+            'error_log':    r'\output_data\shell4_error.data'
+        }
+        self.full_path = {
+            'project': None,
+            'dataset': None,
+            'label': None,
+            'border_log': None,
+            'debug_log': None,
+            'error_log': None
+        }
+        self.refactoring_path()
+        # endregion PATH
+
+    def refactoring_path(self):
+        # PROJECT_PATH = self.DEFAULT_PATH['project']
+        for key in self.DEFAULT_PATH.keys():
+            if key != 'project':
+                self.full_path[key] = self.DEFAULT_PATH['project'] + \
+                                      self.DEFAULT_PATH[key]
+            else:
+                self.full_path[key] = self.DEFAULT_PATH[key]
+
 

@@ -229,11 +229,11 @@ class DataDictionary(settings.DataDictionarySettings):
             self.shell = shell
 
     def create_shell(self):
-        self.shell = shell_selection.get_shell(self)
+        self.shell = shell_selection.get_shell(self, st=self.st)
     # endregion SHELL
 
+    # region GROUP
     def set_groups(self, groups=None):
-
         if groups is None:
             self.groups = grouping.get_groups(self, self.st)
         else:
@@ -241,6 +241,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def get_groups(self):
         return self.groups
+    # endregion GROUP
 
     def get_ability(self):
         import ability

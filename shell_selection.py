@@ -5,28 +5,30 @@ There we will select shell obj
 # TODO: shell_selection:    add more algorithms
 
 
-def get_shell(instance=None):
-
+def get_shell(instance, st):
     import datetime
-    path = instance.path
-    file = open(path + '\\output_data\\shell4_border.data', mode='w')
-    file.write(str(datetime.datetime.now()))
 
-    file.write("\n\n")
-    shell = set()
+    # region LOG_FILES
+    # path = instance.path  # moved to st
+    border_file = open(st.full_path['border_log'], mode='w')
+    border_file.write(str(datetime.datetime.now()))
+    border_file.write("\n\n")
 
-    debugf = open(path + '\\output_data\\shell_debug.data', mode='w')
-    debugf.write(str(datetime.datetime.now()))
-    debugf.write('\n\n')
+    debug_file = open(st.full_path['debug_log'], mode='w')
+    debug_file.write(str(datetime.datetime.now()))
+    debug_file.write('\n\n')
 
-    error_file = open(path + '\\output_data\\shell4_error.data', mode='w')
+    error_file = open(st.full_path['error_log'], mode='w')
     error_file.write(str(datetime.datetime.now()))
     error_file.write("\n\n")
+    # endregion LOG_FILES end
+
+    shell = set()
 
     for host_id in instance.ids:
         # DEBUG
         near = instance.get_rel_of(host_id)
-        file.write(f":: HOST ID {host_id} data:\n{near}::\n")
+        border_file.write(f":: HOST ID {host_id} data:\n{near}::\n")
 
         # forming friendly <O(Si)> objects set
         friends = set()
@@ -39,7 +41,7 @@ def get_shell(instance=None):
                 friends.add(int(row[0]))
         friends.add(host_id)
 
-        file.write(f":: f.len = {len(friends)} id,R,class={near}"
+        border_file.write(f":: f.len = {len(friends)} id,R,class={near}"
                    f"friends: len={len(friends)} {friends}::\n")
 
         # Seeking nearest obj to nearest_opponent from host_id friends
@@ -55,7 +57,7 @@ def get_shell(instance=None):
             f"shell_obj: {shell_obj}" \
             f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n" \
             f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
-        debugf.write(s)
+        debug_file.write(s)
 
     return shell
 
