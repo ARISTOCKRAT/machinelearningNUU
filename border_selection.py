@@ -22,8 +22,8 @@ def get_border(instanse):
             near = instanse.get_rel_of(host_id)  # get relative table of obj
 
             for rel_of in near:          # looking for opponent on rel_of host_id
-                if instanse.labels[host_id] != rel_of[2]:  # opponent found
-                    border.add(int(rel_of[0]))  # add opponent_id into border_dic
+                if instanse.labels[host_id] != int(rel_of[2]):  # opponent found
+                    border.add(int(rel_of[0]))  # add opponent_id into border_dict
                     link[int(rel_of[0])] += 1
                     break  # stop looking for opponent
             else:  # if no opponent found
@@ -32,7 +32,7 @@ def get_border(instanse):
                     f"\thost_id:{host_id}; rel_of[{host_id}]:{near}\n"
                 error_handler.write(s)
 
-        return border.copy(), link
+        return border.copy(), link.copy()
 
     except Exception as e:
         import error_handler

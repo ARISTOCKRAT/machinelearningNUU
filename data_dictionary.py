@@ -86,7 +86,7 @@ class DataDictionary(settings.DataDictionarySettings):
         for host_id in self.ids:
             for other_idn in self.ids:
                 rel[host_id][other_idn] = \
-                    self.distance(host_id, other_idn, metric=metric, p=p, w=p)
+                    self.distance(host_id, other_idn, self.st, metric=metric, p=p, w=p)
 
         self.rel = rel
 
@@ -96,7 +96,7 @@ class DataDictionary(settings.DataDictionarySettings):
         :param metric:         # by default 1 ==> Euclidean
         :return:               # None
         """
-        metric = validator.metric(metric)
+        metric = validator.metric(metric, self.st)
 
         if rel_table is None:
             self.create_rel_table(metric=metric, p=p, w=w)
@@ -104,15 +104,16 @@ class DataDictionary(settings.DataDictionarySettings):
         else:
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, *, metric=None, p=None, w=None, rel_table=None):
+    def distance(self, host_id, other_id, st, *, metric=None, p=None, w=None, rel_table=None):
 
         if rel_table is None:
             return metriclib.distance(
-                self, host_id, other_id, metric, p=p, w=w
+                self, host_id, other_id, st=st, metric=metric, p=p, w=w
             )
         else:
             return metriclib.distance(
-                self, host_id, other_id, metric, p=p, w=w, rel_table=rel_table
+                self, host_id, other_id, st=st, metric=metric, p=p, w=w,
+                rel_table=rel_table
             )
 
     def get_rel_of(self, host_id, *_, rel_table=None):
@@ -193,61 +194,29 @@ class DataDictionary(settings.DataDictionarySettings):
 
     # /end/ def get_link(self, host_id=None):
 
-    def get_border(self):
+    def create_border(self):
         border, link = border_selection.get_border(self)
+        self.border = border
         self.link = link
-        return border
 
-    '''
-    def get_border(self):
-        """ identify BORDER objects
-
-        :param data_dict:   - data in own dictionary form.
-        :return:            - set of border obj's id_number
-        """
-
-        self.link = dict()
-
-        for host_id in self.ids:
-            self.link[host_id] = 0
-
-        near = None
-        try:
-            border = set()  # ids of border objects
-
-            for host_id in self.ids:  # for each obj
-                near = self.get_rel_of(host_id)  # get relative table of obj
-
-                for rel_of in near:          # looking for opponent on rel_of host_id
-                    if self.labels[host_id] != rel_of[2]:  # opponent found
-                        border.add(int(rel_of[0]))  # add opponent_id into border_dic
-                        self.link[int(rel_of[0])] += 1
-                        break  # stop looking for opponent
-                else:  # if no opponent found
-                    print(f"no opponent found for {host_id}")
-
-            return border.copy()
-
-        except Exception as e:
-            print(f"host_id:{host_id};\tnear:{near};\n")
-                  # f"len near:{self.link}")
-            print(f'data_dict contents not valid data. {e.args}')
-            return set()
-    '''
+    def get_border(self, *_, recreate=False):
+        if recreate: self.create_border()
+        return self.border
 
     def set_border(self, border=None):
 
         if border is not None:
             self.border = border
         else:
-            self.border = self.get_border()
+            self.border = self.get_border(recreate=True)
 
     def get_noise(self, requested_id=None, border=None):
         """ identify NOISE objects
 
-            :param data_dict:   - data in own dictionary form.
-            :param border:      - IDs of border obj
-            :return:            - set of noise obj's id_number
+        :param requested_id:    - check requested_id is noise or not (optional)
+        :param border:          - IDs of border obj
+        :return:                - 1) set of noise obj's id_number //
+                                  2) True/False (if id given)
         """
 
         if border is None:

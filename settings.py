@@ -5,7 +5,7 @@ Here we would keep settings
 # TODO: settings:   move all settings to this file
 
 
-class rel_of():
+class Rel_Of():
 
     idn = 0
     radius = 1
@@ -91,4 +91,5 @@ class AllSettings:
 
     def __init__(self):
         self.metric = MetricClass()
+        self.rel_of = Rel_Of()
 
