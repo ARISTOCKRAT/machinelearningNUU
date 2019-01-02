@@ -213,10 +213,10 @@ class DataDictionary(settings.DataDictionarySettings):
     def get_noise(self, requested_id=None, border=None):
         """ identify NOISE objects
 
-        :param requested_id:    - check requested_id is noise or not (optional)
+        :param requested_id:    -*check requested_id is noise or not (optional)
         :param border:          - IDs of border obj
         :return:                - 1) set of noise obj's id_number //
-                                  2) True/False (if id given)
+                                  2) True/False (if id given)*
         """
 
         if border is None:
@@ -237,12 +237,9 @@ class DataDictionary(settings.DataDictionarySettings):
                     else:
                         break
 
-                try:
-                    if L == 0 or K/L > 1:
-                        noise.add(host_id)
-                except Exception as e:
-                    print(f"NOISE ERROR:   id:{host_id:4} K={K:3} L={L:3}\t{e.args}")
-                    print(f"rel_of({host_id}: {self.get_rel_of(host_id)})")
+                if K > L:
+                    noise.add(host_id)
+
         else:
             host_id = requested_id
             K = self.get_link(host_id)
