@@ -39,6 +39,8 @@ class DataDictionarySettings:
         self.link = None
         self.path = None
 
+        self.border = None
+        self.noise = None
         self.shell = None
         self.groups = None
         self.ability = None

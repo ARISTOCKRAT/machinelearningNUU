@@ -9,6 +9,7 @@ import validator
 import metric as metriclib
 import border_selection
 import error_handler
+import noise_selection
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -160,39 +161,17 @@ class DataDictionary(settings.DataDictionarySettings):
                 error_handler.write(s)
             return None
 
+    # region BORDER
     def set_link(self, link=None):
-        """ CALCULATE K = number of links ***************************************
-            data_dict[<id_number>]            === dict with all data about object
-            data_dict[<id_number>]['link']    === number of border links
-                                                = (для скольких этот объект является граничным)
-        ************************************************************************* """
 
-        # if link is None:
-        #     self.link = dict()
-        #
-        #     for host_id in self.ids:
-        #         self.link[host_id] = 0
-        #
-        #     for host_id in self.ids:
-        #         near = self.get_rel_of(host_id)
-        #
-        #         for rel_of in near:
-        #             if self.labels[host_id] != rel_of[2]:
-        #                 self.link[int(rel_of[0])] += 1
-        #                 break
-        # else:
-        #     self.link = link
-
-        ...
-        # EoF set_link(self, link=None):
+        if link:
+            self.link = link
 
     def get_link(self, host_id=None):
         if host_id is None:
             return self.link.copy()
         else:
             return self.link[host_id]
-
-    # /end/ def get_link(self, host_id=None):
 
     def create_border(self):
         border, link = border_selection.get_border(self)
@@ -210,7 +189,17 @@ class DataDictionary(settings.DataDictionarySettings):
         else:
             self.border = self.get_border(recreate=True)
 
-    def get_noise(self, requested_id=None, border=None):
+    # endregion BORDER
+
+    # region NOISE
+
+    def set_noise(self, *_, noise=None, recreate=False):
+        if recreate or noise is None:
+            self.noise = noise_selection.get_noise(self)
+        else:
+            self.noise = noise
+
+    def get_noise(self, requested_id=None, border=None, *_, recreate=False):
         """ identify NOISE objects
 
         :param requested_id:    -*check requested_id is noise or not (optional)
@@ -219,48 +208,13 @@ class DataDictionary(settings.DataDictionarySettings):
                                   2) True/False (if id given)*
         """
 
-        if border is None:
-            border = self.border
+        if recreate or self.noise is None:
+            self.set_noise(recreate=True)
+        return self.noise  # EoF get_noise()
 
-        noise = set()
+    # endregion NOISE
 
-        if requested_id is None:
-            for host_id in border:
-                K = self.get_link(host_id)
-
-                # Calc L (count of friendly within R = distance to nearest opponent)
-                L = 0
-                near = self.get_rel_of(host_id)
-                for rel_of in near:
-                    if self.labels[host_id] == int(rel_of[2]):
-                        L += 1
-                    else:
-                        break
-
-                if K > L:
-                    noise.add(host_id)
-
-        else:
-            host_id = requested_id
-            K = self.get_link(host_id)
-            L = 0
-            near = self.get_rel_of(host_id)
-            for rel_of in near:
-                if self.labels[host_id] == int(rel_of[2]):
-                    L += 1
-                else:
-                    break
-
-            try:
-                if K / L > 1:
-                    return True
-            except Exception as e:
-                print(f"NOISE ERROR:   id:{host_id:4} K={K:3} L={L:3}\t{e.args}")
-
-            return False
-
-        return noise.copy()  # EoF get_noise()
-
+    # region SHELL
     def get_shell(self):
         """ identify SHELL objects
         :param data_dict:   - data in own dictionary form.
