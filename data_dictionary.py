@@ -10,6 +10,7 @@ import metric as metriclib
 import border_selection
 import error_handler
 import noise_selection
+import shell_selection
 
 # TODO: data_dict: Change name of DataDict
 # TODO: data_dict: move all init_variables to setting.py
@@ -215,22 +216,21 @@ class DataDictionary(settings.DataDictionarySettings):
     # endregion NOISE
 
     # region SHELL
-    def get_shell(self):
-        """ identify SHELL objects
-        :param data_dict:   - data in own dictionary form.
-        :return:            - set of shell obj's id_number
-        """
-        import shell_selection
+    def get_shell(self, *_, recreate=False):
+        """ identify SHELL objects """
+        if recreate:
+            self.create_shell()
+        return self.shell
 
-        shell = shell_selection.get_shell(self)
+    def set_shell(self, shell=None, *_, recreate=False):
+        if recreate or shell is None:
+            self.create_shell()
+        if shell:
+            self.shell = shell
 
-        return shell  # EoF get_shell
-
-    def set_shell(self, shell=None):
-        if shell is None:
-            shell = self.get_shell()
-
-        self.shell = shell
+    def create_shell(self):
+        self.shell = shell_selection.get_shell(self)
+    # endregion SHELL
 
     def set_groups(self, groups=None):
 
