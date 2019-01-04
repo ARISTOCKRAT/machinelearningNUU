@@ -2,7 +2,7 @@
 # TODO: border_selection: more algorithms for border selection
 
 
-def get_border(instanse):
+def get_border(instanse, st):
     """ identify BORDER objects
 
     :param data_dict:   - data in own dictionary form.
@@ -22,7 +22,8 @@ def get_border(instanse):
             near = instanse.get_rel_of(host_id)  # get relative table of obj
 
             for rel_of in near:          # looking for opponent on rel_of host_id
-                if instanse.labels[host_id] != int(rel_of[2]):  # opponent found
+                # if rel_of[st.rel_of.idn] in instanse.ids:
+                if instanse.labels[host_id] != int(rel_of[st.rel_of.label]):  # opponent found
                     border.add(int(rel_of[0]))  # add opponent_id into border_dict
                     link[int(rel_of[0])] += 1
                     break  # stop looking for opponent

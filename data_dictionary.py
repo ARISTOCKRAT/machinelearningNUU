@@ -58,6 +58,8 @@ class DataDictionary(settings.DataDictionarySettings):
         self.set_rel_table(metric=metric)
         # self.rel = self.get_rel_table(metric=self.metric)  # set is enough
 
+    # region REL_TABLE
+    # REWORK rel_table.
     def get_rel_table(self, metric=1, *_, rel_table=None, recreate=False):
 
         # if recreate:
@@ -144,6 +146,8 @@ class DataDictionary(settings.DataDictionarySettings):
         rel_of = rel_of[rel_of[:, 1].argsort()]
         return rel_of
 
+    # endregion REL_TABLE
+
     def get_nearest_opponent(self, host_id, *_, rel_table=None):
             """Returns: list like [<r>, <opponent_id>, <opponent_class>]
                     r              === distance to other object
@@ -175,7 +179,7 @@ class DataDictionary(settings.DataDictionarySettings):
             return self.link[host_id]
 
     def create_border(self):
-        border, link = border_selection.get_border(self)
+        border, link = border_selection.get_border(self, self.st)
         self.border = border
         self.link = link
 
@@ -233,14 +237,22 @@ class DataDictionary(settings.DataDictionarySettings):
     # endregion SHELL
 
     # region GROUP
-    def set_groups(self, groups=None):
-        if groups is None:
-            self.groups = grouping.get_groups(self, self.st)
-        else:
+    def create_group(self):
+        self.groups = grouping.get_groups(self, self.st)
+
+    def set_groups(self, groups=None, *_, recreate=False):
+        if recreate or groups is None:
+            self.create_group()
+        if groups:
             self.groups = groups
 
-    def get_groups(self):
+    def get_groups(self, recreate=False):
+
+        if recreate or self.groups:
+            self.create_group()
+
         return self.groups
+
     # endregion GROUP
 
     def get_ability(self):

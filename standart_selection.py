@@ -13,7 +13,6 @@ def get_standart(instance, groups):
     s += f"init_data:: groups: {groups}\n"
     _log.write(s)
 
-
     # sorting groups by their length. It is IMPORTANT
     # cuz this grands us the only solution
 

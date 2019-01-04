@@ -5,7 +5,7 @@ Here we would keep settings
 # TODO: settings:   move all settings to this file
 
 
-class Rel_Of():
+class RelOf():
 
     idn = 0
     radius = 1
@@ -97,7 +97,7 @@ class AllSettings:
 
     def __init__(self):
         self.metric = MetricClass()
-        self.rel_of = Rel_Of()
+        self.rel_of = RelOf()
 
         # region PATH
         self.DEFAULT_PATH = {
@@ -108,15 +108,16 @@ class AllSettings:
             # log path
             'border_log':   r'\output_data\border.log',
             'shell_log':    r'\output_data\shell.log',
-            'error_log':    r'\output_data\shell4_error.data'
+            'error_log':    r'\output_data\error.data',
+            'binary_log':  r'\output_data\group_binary.log'
         }
         self.full_path = {
-            'project': None,
-            'dataset': None,
-            'label': None,
-            'border_log': None,
-            'shell_log': None,
-            'error_log': None
+            # 'project': None,
+            # 'dataset': None,
+            # 'label': None,
+            # 'border_log': None,
+            # 'shell_log': None,
+            # 'error_log': None
         }
         self.refactoring_path()
         # endregion PATH
