@@ -163,7 +163,7 @@ class DataDictionary(settings.DataDictionarySettings):
             else:
                 s = f"ERROR:     dd.get_nearest_opponent(host_id={host_id})\n" \
                     f"\tnearest_opponent not found:: rel_of({host_id})={rel_of}"
-                error_handler.write(s)
+                error_handler.write(s, self.st)
             return None
 
     # region BORDER
@@ -262,5 +262,5 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def get_standard(self, groups):
         import standart_selection
-        return standart_selection.get_standart(self, groups)
+        return standart_selection.get_standart(self, groups, self.st)
 

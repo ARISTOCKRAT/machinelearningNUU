@@ -31,7 +31,7 @@ def get_border(instanse, st):
                 import error_handler
                 s = f"ERROR:: no border obj found :: border_selection ::\n" \
                     f"\thost_id:{host_id}; row[{host_id}]:{near}\n"
-                error_handler.write(s)
+                error_handler.write(s, st)
 
         return border.copy(), link.copy()
 
@@ -40,4 +40,5 @@ def get_border(instanse, st):
         s = f"ERROR:: can't set border :: border_selection ::\n" \
             f"\thost_id:{host_id};\trow[{host_id}]:{near};\n" \
             f"\terror_msg: {e.args}"
+        error_handler.write(s, st)
         return set(), dict()

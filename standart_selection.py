@@ -2,16 +2,18 @@
 Here would be standart obj selection methods
 """
 
+import datetime
 
-def get_standart(instance, groups):
 
-    # DEBUG
-    _log = open(r"d:\_NUU\2018\machine\skulls\output_data\standart_selection.log",
-                mode='a+')
-    import datetime
-    s = str(datetime.datetime.now()) + '\n'
-    s += f"init_data:: groups: {groups}\n"
-    _log.write(s)
+def get_standart(instance, groups, st):
+
+    # region LOG_FILES
+    standart_file = open(st.path.standart_log, mode='w')
+    standart_file.write(str(datetime.datetime.now()))
+    standart_file.write("\n\n")
+    standart_file.write(f"init_data:: groups: {groups}\n")
+
+    # endregion LOG_FILES
 
     # sorting groups by their length. It is IMPORTANT
     # cuz this grands us the only solution
@@ -29,7 +31,7 @@ def get_standart(instance, groups):
     for group in groups_list:
         s = f"\n\n" \
             f"choose group:: {group}\n"
-        _log.write(s)
+        standart_file.write(s)
 
         # declare all obj in group as etalons
         group_etalons = group.copy()
@@ -55,7 +57,7 @@ def get_standart(instance, groups):
         for n, item in enumerate(indent):
 
             s = f"Indent elements sorted by R_to_nearest_opponent:: {indent}\n\n"
-            _log.write(s)
+            standart_file.write(s)
 
             # temporary delete from group_etalons  # indent[n][2] = 0
             # print(f"del [{item[0]}]", end="\t")
@@ -81,7 +83,7 @@ def get_standart(instance, groups):
                 tmp_etalons = instance.ids - notetalons
 
                 s = f"\nrel_of_notetalon_id{notetalon_id}: \n{rel_of_notetalon_id}"
-                _log.write(s)
+                standart_file.write(s)
 
                 # counting friend/opponent numbers
                 for row in rel_of_notetalon_id:
@@ -96,7 +98,7 @@ def get_standart(instance, groups):
                         break
 
                 s = f"\nfriend_counter={friend_counter}; opponnt_counter={opponent_counter}"
-                _log.write(s)
+                standart_file.write(s)
                 if friend_counter > opponent_counter:
                     notetalons.discard(notetalon_id)
                     group_etalons.add(notetalon_id)
@@ -104,13 +106,13 @@ def get_standart(instance, groups):
                         f"cuz friends > opps. {notetalon_id} returned to " \
                         f"group_etalons:{group_etalons}\n" \
                         f"notetalons:{notetalons}"
-                    _log.write(s)
+                    standart_file.write(s)
                 else:
                     s = f"\n" \
                         f"cuz friends <= opps. {notetalon_id} deleted from" \
                         f"group_etalons:{group_etalons}\n" \
                         f"notetalons:{notetalons}"
-                    _log.write(s)
+                    standart_file.write(s)
 
         etalons_list.append(group_etalons)
     # DEBUG

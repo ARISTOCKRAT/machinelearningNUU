@@ -10,15 +10,18 @@ def get_shell(instance, st):
 
     # region LOG_FILES
     # path = instance.path  # moved to st
-    border_file = open(st.full_path['border_log'], mode='w')
+
+    border_file = open(st.path.border_log, mode='w')
     border_file.write(str(datetime.datetime.now()))
     border_file.write("\n\n")
 
-    shell_file = open(st.full_path['shell_log'], mode='w')
+    shell_file = open(st.path.shell_log, mode='w')
+    # shell_file = open(st.full_path['shell_log'], mode='w')
     shell_file.write(str(datetime.datetime.now()))
     shell_file.write('\n\n')
 
-    error_file = open(st.full_path['error_log'], mode='w')
+    error_file = open(st.path.error_log, mode='w')
+    # error_file = open(st.full_path['error_log'], mode='w')
     error_file.write(str(datetime.datetime.now()))
     error_file.write("\n\n")
     # endregion LOG_FILES end
@@ -63,8 +66,8 @@ def get_shell(instance, st):
         #     f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
         shell_file.write(
             f"\nhost_id:{host_id}; opponent:{nearest_opponent_id}; shell_id: {shell_obj[0]}; friends:{friends} \n"
-            f"h->o:{instance.rel[host_id][nearest_opponent_id]}; "
-            f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}"
+            f"h->o: {instance.rel[host_id][nearest_opponent_id]}; "
+            f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}; "
             f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
             f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n"
             f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"

@@ -17,7 +17,7 @@ def grouping(instance):
 def get_groups(instance, st):
 
     # region LOG_FILES
-    binary_file = open(st.full_path['binary_log'], mode='w')
+    binary_file = open(st.path.binary_log, mode='w')
     binary_file.write(str(datetime.datetime.now()))
     binary_file.write("\n\n")
     # endregion LOG_FILES

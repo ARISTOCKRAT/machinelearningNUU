@@ -3,13 +3,57 @@ Here we would keep settings
 """
 
 # TODO: settings:   move all settings to this file
+import validator
 
-
-class RelOf():
+class RelOf:
 
     idn = 0
     radius = 1
     label = 2
+
+
+class PathSettings:
+    # project path
+    project = r'd:\_NUU\2018\machine\skulls'
+    dataset = r'\init_data\skulls.csv'
+    label = r'\init_data\labels.csv'
+
+    # log path
+    border_log = r'\output_data\border.log'
+    shell_log = r'\output_data\shell.log'
+    error_log = r'\output_data\error.log'
+    binary_log = r'\output_data\group_binary.log'
+    standart_log = r'\output_data\standart_selection.log'
+
+    # default path
+    DEFAULT_PATH = {
+        # project path
+        'project': r'd:\_NUU\2018\machine\skulls',
+        'dataset': r'\init_data\skulls.csv',
+        'label': r'\init_data\labels.csv',
+        # log path
+        'border_log': r'\output_data\border.log',
+        'shell_log': r'\output_data\shell.log',
+        'error_log': r'\output_data\error.log',
+        'binary_log': r'\output_data\group_binary.log',
+        'standart_log': r'\output_data\standart_selection.log',
+    }
+
+    #
+    @staticmethod
+    def refactoring_path(project_path=None):
+        if project_path is None: project_path = PathSettings.DEFAULT_PATH['project']
+
+        # project path
+        PathSettings.dataset = project_path + PathSettings.DEFAULT_PATH['dataset']
+        PathSettings.label = project_path + PathSettings.DEFAULT_PATH['label']
+
+        # log path
+        PathSettings.border_log = project_path + PathSettings.DEFAULT_PATH['border_log']
+        PathSettings.shell_log = project_path + PathSettings.DEFAULT_PATH['shell_log']
+        PathSettings.error_log = project_path + PathSettings.DEFAULT_PATH['error_log']
+        PathSettings.binary_log = project_path + PathSettings.DEFAULT_PATH['binary_log']
+        PathSettings.standart_log = project_path + PathSettings.DEFAULT_PATH['standart_log']
 
 
 class DataDictionarySettings:
@@ -74,7 +118,7 @@ class metric:
     }
 
 
-class MetricClass:
+class MetricSettings:
     default_metric = 1
     metric_dict = {
         1: "euclidean",
@@ -96,39 +140,40 @@ class ShellSelection:
 class AllSettings:
 
     def __init__(self):
-        self.metric = MetricClass()
+        self.metric = MetricSettings()
         self.rel_of = RelOf()
+        self.path = PathSettings()
+        self.path.refactoring_path()
 
         # region PATH
-        self.DEFAULT_PATH = {
-            # project path
-            'project':      r'd:\_NUU\2018\machine\skulls',
-            'dataset':      r'\init_data\skulls.csv',
-            'label':        r'\init_data\labels.csv',
-            # log path
-            'border_log':   r'\output_data\border.log',
-            'shell_log':    r'\output_data\shell.log',
-            'error_log':    r'\output_data\error.data',
-            'binary_log':  r'\output_data\group_binary.log'
-        }
-        self.full_path = {
-            # 'project': None,
-            # 'dataset': None,
-            # 'label': None,
-            # 'border_log': None,
-            # 'shell_log': None,
-            # 'error_log': None
-        }
-        self.refactoring_path()
-        # endregion PATH
-
-    def refactoring_path(self):
-        # PROJECT_PATH = self.DEFAULT_PATH['project']
-        for key in self.DEFAULT_PATH.keys():
-            if key != 'project':
-                self.full_path[key] = self.DEFAULT_PATH['project'] + \
-                                      self.DEFAULT_PATH[key]
-            else:
-                self.full_path[key] = self.DEFAULT_PATH[key]
+        # self.DEFAULT_PATH = {
+        #     # project path
+        #     'project':      r'd:\_NUU\2018\machine\skulls',
+        #     'dataset':      r'\init_data\skulls.csv',
+        #     'label':        r'\init_data\labels.csv',
+        #     # log path
+        #     'border_log':   r'\output_data\border.log',
+        #     'shell_log':    r'\output_data\shell.log',
+        #     'error_log':    r'\output_data\error.data',
+        #     'binary_log':  r'\output_data\group_binary.log'
+        # }
+        # self.full_path = {
+        #     # 'project': None,
+        #     # 'dataset': None,
+        #     # 'label': None,
+        #     # 'border_log': None,
+        #     # 'shell_log': None,
+        #     # 'error_log': None
+        # }
+        # self.refactoring_path()
 
 
+        # def refactoring_path(self):
+        #     # PROJECT_PATH = self.DEFAULT_PATH['project']
+        #     for key in self.DEFAULT_PATH.keys():
+        #         if key != 'project':
+        #             self.full_path[key] = self.DEFAULT_PATH['project'] + \
+        #                                   self.DEFAULT_PATH[key]
+        #         else:
+        #             self.full_path[key] = self.DEFAULT_PATH[key]
+        # # endregion PATH    #
