@@ -248,7 +248,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def get_groups(self, recreate=False):
 
-        if recreate or self.groups:
+        if recreate or self.groups is None:
             self.create_group()
 
         return self.groups
