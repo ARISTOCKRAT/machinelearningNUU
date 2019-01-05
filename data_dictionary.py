@@ -200,7 +200,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
     def set_noise(self, *_, noise=None, recreate=False):
         if recreate or noise is None:
-            self.noise = noise_selection.get_noise(self)
+            self.noise = noise_selection.get_noise(self, self.st)
         else:
             self.noise = noise
 

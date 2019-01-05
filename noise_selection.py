@@ -61,7 +61,7 @@ def get_noise(instance, requested_id=None, border=None):
 '''
 
 
-def get_noise(instance, requested_id=None, border=None):
+def get_noise(instance, st, requested_id=None, border=None):
     """ identify NOISE objects
 
     :param instance:        - instance of the DD
@@ -84,7 +84,7 @@ def get_noise(instance, requested_id=None, border=None):
             L = 0
             near = instance.get_rel_of(host_id)
             for rel_of in near:
-                if instance.labels[host_id] == int(rel_of[2]):
+                if instance.labels[host_id] == int(rel_of[st.rel_of.label]):
                     L += 1
                 else:
                     break
@@ -98,7 +98,7 @@ def get_noise(instance, requested_id=None, border=None):
         L = 0
         near = instance.get_rel_of(host_id)
         for rel_of in near:
-            if instance.labels[host_id] == int(rel_of[2]):
+            if instance.labels[host_id] == int(rel_of[st.rel_of.label]):
                 L += 1
             else:
                 break

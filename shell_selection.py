@@ -38,11 +38,11 @@ def get_shell(instance, st):
         friends = set()
         nearest_opponent_id = None
         for n, row in enumerate(near):
-            if row[2] != instance.labels[host_id]:
-                nearest_opponent_id = int(row[0])
+            if row[st.rel_of.label] != instance.labels[host_id]:
+                nearest_opponent_id = int(row[st.rel_of.idn])
                 break
             else:
-                friends.add(int(row[0]))
+                friends.add(int(row[st.rel_of.idn]))
         friends.add(host_id)
 
         border_file.write(f"nearest opponents id:{nearest_opponent_id}; O(Si): len={len(friends)} {friends}. ::\n")
