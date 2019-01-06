@@ -3,15 +3,30 @@ Here would be standart obj selection methods
 """
 
 import datetime
+import error_handler
 
 
-def get_standart(instance, groups, st):
+def get_standard(instance):
+    return method_nuu(instance)
+
+
+def get_standart_old(instance, groups, st):
+
+    # TODO: validate GROUPS
+    groups = instance.groups
 
     # region LOG_FILES
     standart_file = open(st.path.standart_log, mode='w')
     standart_file.write(str(datetime.datetime.now()))
     standart_file.write("\n\n")
     standart_file.write(f"init_data:: groups: {groups}\n")
+
+    # handle validator
+    if groups is None:
+        s = f'DD groups not valid. groups{groups} \n'
+        standart_file.write(s)
+        # print(s)
+        return None
 
     # endregion LOG_FILES
 
@@ -66,7 +81,6 @@ def get_standart(instance, groups, st):
 
             # CHECK for errors on change etalon_label
             for notetalon_id in group - group_etalons:
-                relation_table = []
                 # for other_id in dd['ids'] - \
                 #                 (group - group_etalons) - \
                 #                 {notetalon_id, }:
@@ -193,4 +207,118 @@ def get_standart(groups):
         print(f"\nGROUP ETALONS: {group_etalons}")
 
 """
+
+
+# The method of National University of Uzbekistan
+def method_nuu(instance):
+    # TODO: validate GROUPS
+
+    # sorting groups by their length. It is IMPORTANT
+    # cuz this grands us the only solution
+    groups = instance.groups.copy()  # groups
+    groups.sort(key=len, reverse=True)  # largest to smallest
+
+    st = instance.st                    # settings
+    etalons = instance.ids.copy()       # set of id numbers
+    notetalons = set()                  # init values of notetalon objs
+
+    # region LOG_FILES
+    standard_file = open(st.path.standart_log, mode='w')
+    standard_file.write(str(datetime.datetime.now()))
+    standard_file.write("\n\n")
+    standard_file.write(f"init_data:: groups:\n")
+    for item in groups:
+        standard_file.write(f"{str(item)} \n")
+    # print(f"init_data:: groups: {groups}\n")
+
+    # handle validator
+    if groups is None:
+        s = f'DD groups not valid. groups{groups} \n'
+        standard_file.write(s)
+        # print(s)
+        return None
+
+    # endregion LOG_FILES
+
+    # WORKING IN EACH GROUP SEPARATELY
+    for group in groups:
+
+        # create indent for each element in the group
+        indent = list()  # For list of elements ordered by R to nearest_opponent
+
+        for host_id in group:
+            # indent[ <id>, <R>, <etalon?> ]:
+            #         <id>     - id of group element;
+            #         <R>      - R to nearest_element;  # for sorting
+            #         <etalon> - bool. is this obj etalon?
+            indent.append([
+                host_id,
+                instance.get_nearest_opponent(host_id)[st.rel_of.radius]
+            ])
+
+        # Sorting all elements by R_to_nearest_opponent
+        indent = sorted(indent, key=lambda x: x[1], reverse=False)
+        indent = [x[0] for x in indent]  # keep only ids
+
+        standard_file.write(f"\n\nchoose group:: {group}\n")
+        standard_file.write(f"Indent elements sorted by R_to_nearest_opponent:: {indent}\n\n")
+        # print(f"\n\nchoose group:: {group}\n")
+        # print(f"Indent elements sorted by R_to_nearest_opponent:: {indent}\n\n")
+
+        # working in each ELEMENT of GROUP
+        for n, candidate_to_del in enumerate(indent):
+
+            # temporary delete from etalons
+            etalons.discard(candidate_to_del)
+            notetalons.add(candidate_to_del)
+
+            standard_file.write(f"\nS[{candidate_to_del}] label:{instance.labels[candidate_to_del]} "
+                                f"temporary deleted from etalons. \n")
+            # print(f"S[{candidate_to_del}] temporary deleted from etalons. ")
+
+            # CHECK for errors on change etalon_label
+            rel_of_candidate = instance.get_rel_of(candidate_to_del)
+            # r_to_nearest_opponent_of_candidate = instance.get_nearest_opponent(st.rel_of.radius)
+
+            # looking for nearest obj to candidate
+            # minimum: (<id of nearest obj>, <R to nearest obj>, <label of nearest obj>)
+            minimum = (-1, float('+inf'), -1)
+            for row in rel_of_candidate:
+                if int(row[st.rel_of.idn]) in etalons:
+
+                    # Rs === Radius to nearest opponent of min.obj
+                    Rs = instance.get_nearest_opponent(int(row[st.rel_of.idn]))[st.rel_of.radius]
+
+                    local_metric = row[st.rel_of.radius] / Rs
+
+                    if local_metric < minimum[st.rel_of.radius]:
+                        # DEBUG
+                        s = f"row:{row}. S[{int(row[st.rel_of.idn])}] in etalons. \t Rs: {Rs}\n" \
+                            f"local_metric = {row[st.rel_of.radius]} / {Rs} = {local_metric}\n"
+                        # print(s)
+                        standard_file.write(s)
+
+                        minimum = (row[st.rel_of.idn], local_metric, row[st.rel_of.label])
+                else:
+                    # print(f"{st.rel_of.idn} not in etalons. ", end='\t')
+                    standard_file.write(f"S[{int(row[st.rel_of.idn])}] not in etalons. \t")
+            # we've found nearest obj to candidate11
+            # print(f"minimum: {minimum}")
+            standard_file.write(f"\nNearest obj to the candidate is: {minimum}.\n")
+
+            # check for condition 4.
+            if instance.labels[candidate_to_del] != int(minimum[st.rel_of.label]):
+                # return candidate to the etalons
+                etalons.add(candidate_to_del)
+                notetalons.discard(candidate_to_del)
+
+                standard_file.write(f"S[{candidate_to_del}] returned to the etalons. \n\n")
+                # print(f"S[{candidate_to_del}] returned to the etalons. \n")   # DEBUG
+            else:  # if condition is false, then do nothing
+                standard_file.write(f"S[{candidate_to_del}] permanently deleted from etalons. \n\n")
+                # print(f"S[{candidate_to_del}] permanently deleted from etalons. \n")  # DEBUG
+
+    standard_file.write("\n\n" + "="*50 + '\n\n')
+    standard_file.write(f"standard obj: {etalons}")
+    return etalons
 

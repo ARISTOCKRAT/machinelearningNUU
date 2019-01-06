@@ -1,4 +1,7 @@
 """Here we validate values"""
+
+# TODO: validate GROUPS
+
 import error_handler
 
 

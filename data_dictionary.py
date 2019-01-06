@@ -261,6 +261,6 @@ class DataDictionary(settings.DataDictionarySettings):
         return self.ability
 
     def get_standard(self, groups):
-        import standart_selection
-        return standart_selection.get_standart(self, groups, self.st)
+        import standard_selection
+        return standard_selection.get_standard(self)
 

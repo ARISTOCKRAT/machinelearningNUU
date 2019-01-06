@@ -3,7 +3,7 @@ Here we would keep settings
 """
 
 # TODO: settings:   move all settings to this file
-import validator
+
 
 class RelOf:
 
@@ -38,6 +38,9 @@ class PathSettings:
         'binary_log': r'\output_data\group_binary.log',
         'standart_log': r'\output_data\standart_selection.log',
     }
+
+    def __init__(self):
+        PathSettings.refactoring_path()
 
     #
     @staticmethod
@@ -143,37 +146,6 @@ class AllSettings:
         self.metric = MetricSettings()
         self.rel_of = RelOf()
         self.path = PathSettings()
-        self.path.refactoring_path()
-
-        # region PATH
-        # self.DEFAULT_PATH = {
-        #     # project path
-        #     'project':      r'd:\_NUU\2018\machine\skulls',
-        #     'dataset':      r'\init_data\skulls.csv',
-        #     'label':        r'\init_data\labels.csv',
-        #     # log path
-        #     'border_log':   r'\output_data\border.log',
-        #     'shell_log':    r'\output_data\shell.log',
-        #     'error_log':    r'\output_data\error.data',
-        #     'binary_log':  r'\output_data\group_binary.log'
-        # }
-        # self.full_path = {
-        #     # 'project': None,
-        #     # 'dataset': None,
-        #     # 'label': None,
-        #     # 'border_log': None,
-        #     # 'shell_log': None,
-        #     # 'error_log': None
-        # }
-        # self.refactoring_path()
+        # self.path.refactoring_path()
 
 
-        # def refactoring_path(self):
-        #     # PROJECT_PATH = self.DEFAULT_PATH['project']
-        #     for key in self.DEFAULT_PATH.keys():
-        #         if key != 'project':
-        #             self.full_path[key] = self.DEFAULT_PATH['project'] + \
-        #                                   self.DEFAULT_PATH[key]
-        #         else:
-        #             self.full_path[key] = self.DEFAULT_PATH[key]
-        # # endregion PATH    #

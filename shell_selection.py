@@ -70,8 +70,11 @@ def get_shell(instance, st):
             f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}; "
             f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
             f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n"
-            f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
+            f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n"
+            f"shell:{shell}\n\n"
         )
 
+    shell_file.write("\n\n" + "=" * 50 + '\n\n')
+    shell_file.write(f"standard obj: {shell}")
     return shell
 
