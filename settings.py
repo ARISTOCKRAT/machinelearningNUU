@@ -15,8 +15,9 @@ class RelOf:
 class PathSettings:
     # project path
     project = r'd:\_NUU\2018\machine\skulls'
-    dataset = r'\init_data\skulls.csv'
-    label = r'\init_data\labels.csv'
+    dataset_path = project + r'\init_data\skull'
+    dataset = project + r'\Objects.csv'
+    label = project + r'\Target.csv'
 
     # log path
     border_log = r'\output_data\border.log'
@@ -25,14 +26,14 @@ class PathSettings:
     shell_log = r'\output_data\shell.log'
     error_log = r'\output_data\error.log'
     binary_log = r'\output_data\group_binary.log'
-    standart_log = r'\output_data\standard_selection.log'
+    standard_log = r'\output_data\standard_selection.log'
 
     # default path
     DEFAULT_PATH = {
         # project path
         'project': r'd:\_NUU\2018\machine\skulls',
-        'dataset': r'\init_data\skulls.csv',
-        'label': r'\init_data\labels.csv',
+        'dataset': r'\Objects.csv',
+        'label': r'\Target.csv',
         # log path
         'border_log': r'\output_data\border.log',
         'border_after_log': r'\output_data\border_after_noise.log',
@@ -48,12 +49,14 @@ class PathSettings:
 
     #
     @staticmethod
-    def refactoring_path(project_path=None):
-        if project_path is None: project_path = PathSettings.DEFAULT_PATH['project']
-
+    def refactoring_path(project_path=None, *, dataset=None, label=None):
         # project path
-        PathSettings.dataset = project_path + PathSettings.DEFAULT_PATH['dataset']
-        PathSettings.label = project_path + PathSettings.DEFAULT_PATH['label']
+        # if project_path is None: project_path = PathSettings.DEFAULT_PATH['project']
+        # PathSettings.label = project_path + PathSettings.DEFAULT_PATH['label']
+
+        project_path = project_path if project_path else PathSettings.DEFAULT_PATH['project']
+        PathSettings.dataset = dataset if dataset else project_path + PathSettings.DEFAULT_PATH['dataset']
+        PathSettings.label = label if label else project_path + PathSettings.DEFAULT_PATH['label']
 
         # log path
         PathSettings.border_log = project_path + PathSettings.DEFAULT_PATH['border_log']
@@ -82,9 +85,10 @@ class DataDictionarySettings:
         self.df = None
         self.labels = None
         self.ids = None
-        self.row_count = None
-        self.col_count = None
-        self.shape = None
+        self.sample = None
+        # self.row_count = None
+        # self.col_count = None
+        self.__shape = None
         self.rel = None
         self.border = None
 
@@ -114,19 +118,6 @@ class ErrorHandler:
     error_file_path = r"d:\_NUU\2018\machine\skulls\output_data\error.log"
 
 
-class metric:
-    default_metric = 1
-    metric_dict = {
-        1: "euclidean",
-        2: "manhattan",
-        3: "chebyshev",
-        4: "minkowski",
-        # 5: "wminkowski",
-        # 6: "seuclidean",
-        # 7: "mahalanobis"
-    }
-
-
 class MetricSettings:
     default_metric = 1
     metric_dict = {
@@ -140,10 +131,6 @@ class MetricSettings:
     }
     p = 2
     w = 1  # TODO: must be a n-size vector; n = features count
-
-
-class ShellSelection:
-    ...
 
 
 class AllSettings:

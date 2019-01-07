@@ -35,21 +35,21 @@ def distance(instance, host_id, other_id, st, *, metric=None, p=2, w=1, rel_tabl
 
     metric = validator.metric(metric, st)
 
-    if settings.metric.metric_dict[metric] == 'euclidean':
+    if st.metric.metric_dict[metric] == 'euclidean':
         return __euclidean_distance(instance, host_id, other_id)
 
-    elif settings.metric.metric_dict[metric] == 'chebyshev':
+    elif st.metric.metric_dict[metric] == 'chebyshev':
         return __chebyshev_distance(instance, host_id, other_id)
 
-    elif settings.metric.metric_dict[metric] == 'manhattan':
+    elif st.metric.metric_dict[metric] == 'manhattan':
         return __manhattan_distance(instance, host_id, other_id)
 
     # w - MUST BE A VECTOR ??
-    elif settings.metric.metric_dict[metric] == 'minkowski':
+    elif st.metric.metric_dict[metric] == 'minkowski':
         return __minkowski_distance(instance, host_id, other_id, p, w)
 
     # w - MUST BE A VECTOR ??
-    elif settings.metric.metric_dict[metric] == 'wminkowski':
+    elif st.metric.metric_dict[metric] == 'wminkowski':
         return __minkowski_distance(instance, host_id, other_id, p, w)
 
 

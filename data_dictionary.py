@@ -31,32 +31,74 @@ class DataDictionary(settings.DataDictionarySettings):
         """init data"""
         super(DataDictionary, self).__init__()
 
-        self.st = settings.AllSettings()
-
-        # ************* VARIABLES ***************
-        # ************/ VARIABLES /************** #
+        self.st = settings.AllSettings()    # Here we keep Settings for project
 
     def load_data(self,
-                  datafile_path="init_data\\skulls.csv",
-                  labelfile_path="init_data\\labels.csv",
                   *,
-                  metric=1):
-        """loading data set"""
+                  dataset_path=r"folder\with\Objects.csv",
+                  dataset_file=r"full\path\to\the\Objects.csv",
+                  target_file=r"full\path\to\the\Target.csv",
+                  metric="Euclidean",  # Metric
+                  p=2,  # metric
+                  w=1,
+                  normalize=0,):
+        """ Loading dataset
+        :param dataset_path: path to the folder with Objects.csv and Target.csv
+                             Set this or next 2
+        :param dataset_file: fullpath of Objects.csv file
+        :param target_file:  fullpath of Target.csv file
+        :param metric:       Name or Number of metric
+        :param p:            arg for some metrics
+        :param w:            arg for some metrics
+        :param normalize:    Name or Number of normalize algorithm
+        :return:             True === OK / None === Some Error
+        """
 
-        from numpy import genfromtxt
+        # region VALIDATE ARGs
 
-        self.path = "d:\\_NUU\\2018\\machine\\skulls"
+        # file path
+        if dataset_path != r"folder\with\Objects.csv":
+            self.st.path.dataset = dataset_path.rstrip('\\') + '\\' + \
+                                   self.st.path.DEFAULT_PATH['dataset'].strip('\\\t\ ')
+                                   # self.st.path.dataset.strip('\\\t\n ')
+            self.st.path.label = dataset_path.rstrip('\\') + '\\' + \
+                                 self.st.path.DEFAULT_PATH['label'].strip('\\\t\n ')
 
-        self.file_path = datafile_path
-        self.df = genfromtxt(datafile_path, delimiter=",")
-        self.labels = genfromtxt(labelfile_path, delimiter=",")
-        self.shape = self.df.shape
-        self.row_count = self.shape[0]
-        self.col_count = self.shape[1]
-        self.ids = set(range(self.df.shape[0]))
+        if dataset_file != r"full\path\to\the\Objects.csv": self.st.path.dataset = dataset_file
 
-        self.set_rel_table(metric=metric)
-        # self.rel = self.get_rel_table(metric=self.metric)  # set is enough
+        if target_file != r"full\path\to\the\Target.csv": self.st.path.label = target_file
+
+        if not (validator.file_exist(self.st.path.dataset) and
+                validator.file_exist(self.st.path.label)):
+            print(f"ERROR:  on open {self.st.path.dataset} or {self.st.path.label}")
+            return
+
+        # metric
+        metric = validator.metric(metric, self.st)
+        p, w = validator.metric_pw(p, w, self.st)
+        if not(p and w and metric):
+            print(f"ERROR:   on metric: {metric} or p: {p} or w: {w}")
+            return
+        else:
+            self.st.metric.default_metric = validator.metric(metric, self.st)
+            self.st.metric.p = p
+            self.st.metric.w = w
+
+        # normalize
+        if normalize:
+            pass
+        # endregion VALIDATE
+
+        # load data
+        self.df = np.genfromtxt(self.st.path.dataset, delimiter=',')
+        self.labels = np.genfromtxt(self.st.path.label, delimiter=",")
+
+        self.__shape = self.df.shape
+        self.ids = set(range(self.__shape[0]))
+        self.sample = self.ids.copy()
+
+        self.set_rel_table()
+        return True
 
     # region REL_TABLE
     # REWORK rel_table.
@@ -72,7 +114,7 @@ class DataDictionary(settings.DataDictionarySettings):
         p, w = validator.metric_pw(p, w, self.st)
 
         # create a shape of relations table
-        rel = np.zeros((self.row_count, self.row_count))
+        rel = np.zeros((self.__shape[0], self.__shape[0]))
 
         for host_id in self.ids:
             for other_idn in self.ids:
@@ -81,12 +123,21 @@ class DataDictionary(settings.DataDictionarySettings):
 
         self.rel = rel
 
-    def set_rel_table(self, *_, rel_table=None, metric=1, p=None, w=None):
+    def set_rel_table(self, *_, rel_table=None, metric=None, p=None, w=None, recreate=False):
         """
         :param rel_table:      # rel_table with which you want replace self.rel_table
         :param metric:         # by default 1 ==> Euclidean
         :return:               # None
         """
+
+        # if metric is None:
+        #     metric = self.st.metric.default_metric
+        # else:
+        #     metric = validator.metric(metric, self.st)
+        #     if metric != self.st.metric.default_metric:
+        #
+
+
         metric = validator.metric(metric, self.st)
 
         if rel_table is None:

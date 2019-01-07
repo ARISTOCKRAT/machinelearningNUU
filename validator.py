@@ -83,3 +83,16 @@ def rel_table(rel_table_obj):
     if type(rel_table_obj) is not np.array:
         return None
 
+
+def file_exist(file_path):
+    path = None
+    try:
+        f = open(file_path, mode='r')
+        f.close()
+    except Exception as e:
+        msg = f"ERROR:   on open file by path {path}. msg:{e.args}"
+        error_handler.write(msg)
+        return False
+    else:
+        return True
+
