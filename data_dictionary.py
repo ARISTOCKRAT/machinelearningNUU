@@ -41,12 +41,16 @@ class DataDictionary(settings.DataDictionarySettings):
                   metric="Euclidean",  # Metric
                   p=2,  # metric
                   w=1,
-                  normalize=0,):
+                  normalize=0,
+                  delimiter=None,
+                  ):
         """ Loading dataset
+
         :param dataset_path: path to the folder with Objects.csv and Target.csv
                              Set this or next 2
         :param dataset_file: fullpath of Objects.csv file
         :param target_file:  fullpath of Target.csv file
+        :param delimiter:    data delimiter in dataset
         :param metric:       Name or Number of metric
         :param p:            arg for some metrics
         :param w:            arg for some metrics
@@ -87,11 +91,15 @@ class DataDictionary(settings.DataDictionarySettings):
         # normalize
         if normalize:
             pass
+
+        if delimiter is None:
+            delimiter = self.delimiter
+
         # endregion VALIDATE
 
         # load data
-        self.df = np.genfromtxt(self.st.path.dataset, delimiter=',')
-        self.labels = np.genfromtxt(self.st.path.label, delimiter=",")
+        self.df = np.genfromtxt(self.st.path.dataset, delimiter=delimiter)
+        self.labels = np.genfromtxt(self.st.path.label, delimiter=delimiter)
 
         self.__shape = self.df.shape
         self.ids = set(range(self.__shape[0]))
@@ -130,12 +138,12 @@ class DataDictionary(settings.DataDictionarySettings):
         :return:               # None
         """
 
-        # if metric is None:
-        #     metric = self.st.metric.default_metric
-        # else:
-        #     metric = validator.metric(metric, self.st)
-        #     if metric != self.st.metric.default_metric:
-        #
+        if metric is None:
+            metric = self.st.metric.default_metric
+        else:
+            metric = validator.metric(metric, self.st)
+            if metric != self.st.metric.default_metric:
+                self.st.metric.default_metric = metric
 
 
         metric = validator.metric(metric, self.st)
