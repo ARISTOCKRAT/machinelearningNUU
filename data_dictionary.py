@@ -62,23 +62,7 @@ class DataDictionary(settings.DataDictionarySettings):
     # REWORK rel_table.
     def get_rel_table(self, metric=1, *_, recreate=False):
 
-        # if recreate:
-        #
-        #     self.create_rel_table(metric=metric, p=2, w=1)
-        #     # validate
-        #     metric = validator.metric(metric)
-        #
-        #     rel = np.arange(self.row_count**2).reshape((self.row_count, self.row_count))
-        #
-        #     for host_id in self.ids:
-        #         line = []
-        #         for other_idn in self.ids:
-        #             rel[host_id][other_idn] = \
-        #                 self.distance(host_id, other_idn, metric=metric, rel_table=rel_table)
-        #
-        # return rel
-
-        if recreate: self.rel = self.create_rel_table()
+        if recreate: self.create_rel_table()
 
         return self.rel
 
