@@ -71,8 +71,8 @@ def metric_pw(p, w, st):
     :return:    === tuple of 2 elements p, w
     """
     # TODO: checker
-    p = st.metric.p
-    w = st.metric.w
+    # p = st.metric.p
+    # w = st.metric.w
     return p, w
 
 

@@ -116,7 +116,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
         return self.rel
 
-    def create_rel_table(self, metric=1, *_, p=None, w=None):
+    def create_rel_table(self, metric, *_, p=None, w=None):
         # validate
         metric = validator.metric(metric, self.st)
         p, w = validator.metric_pw(p, w, self.st)
@@ -131,27 +131,38 @@ class DataDictionary(settings.DataDictionarySettings):
 
         self.rel = rel
 
-    def set_rel_table(self, *_, rel_table=None, metric=None, p=None, w=None, recreate=False):
+    def set_rel_table(self, *_, rel_table=None, metric=None, p=None, w=None):
+        """ Set or recreate self.rel
+
+        :param rel_table:      rel_table with which you want replace self.rel_table
+        :param metric:         metric (# Euclidean, manhattan...)
+        :param p:              used in some metrics
+        :param w:              used in some metrics
+        :return:               None
         """
-        :param rel_table:      # rel_table with which you want replace self.rel_table
-        :param metric:         # by default 1 ==> Euclidean
-        :return:               # None
-        """
-
-        if metric is None:
-            metric = self.st.metric.default_metric
-        else:
-            metric = validator.metric(metric, self.st)
-            if metric != self.st.metric.default_metric:
-                self.st.metric.default_metric = metric
-
-
-        metric = validator.metric(metric, self.st)
 
         if rel_table is None:
+            if metric or p or w:
+                metric = validator.metric(metric, self.st)
+                p, w = validator.metric_pw(p, w, self.st)
+
+                if metric != self.st.metric.default_metric:
+                    self.st.metric.default_metric = metric
+                    self.flag.metric = True
+                if p != self.st.metric.p:
+                    self.st.metric.p = p
+                    self.flag.metric = True
+                if w != self.st.metric.w:
+                    self.st.metric.w = w
+                    self.flag.metric = True
+            else:
+                metric = self.st.metric.default_metric
+                p = self.st.metric.p
+                w = self.st.metric.w
+
             self.create_rel_table(metric=metric, p=p, w=w)
-            # self.rel = self.get_rel_table(metric=metric, p=2, w=1, recteate=True)
         else:
+            # need validation
             self.rel = rel_table
 
     def distance(self, host_id, other_id, st, *, metric=None, p=None, w=None, rel_table=None):

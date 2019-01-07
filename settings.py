@@ -68,12 +68,22 @@ class PathSettings:
         PathSettings.standard_log = project_path + PathSettings.DEFAULT_PATH['standard_log']
 
 
+class FlagSettings:
+    metric = False
+
+    @staticmethod
+    def changed():
+        c = set()
+        if FlagSettings.metric:
+            c.add('metric')
+        return c
+
+
 class DataDictionarySettings:
 
     def __init__(self):
-        # default metric
 
-        self.epsilon = 10 ** -7  # may be it will be useful somewere
+        self.epsilon = 10 ** -7  # may be it will be useful somewhere
 
         self.df = None
         self.labels = None
@@ -82,12 +92,9 @@ class DataDictionarySettings:
 
         self.__shape = None
         self.rel = None
-
-
         self.near_table = None
 
         self.link = None
-
         self.border = None
         self.noise = None
         self.shell = None
@@ -96,8 +103,11 @@ class DataDictionarySettings:
         self.standard = None
 
         # load_data
-        delimiter = ','
+        self.delimiter = ','
         # self.load_data = {"delimiter": ","}
+
+        # FLAGS
+        self.flag = FlagSettings()
 
 
 class ErrorHandler:
