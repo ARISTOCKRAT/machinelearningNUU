@@ -25,9 +25,7 @@ Metrics intended for real-valued vector spaces:
 """
 
 
-# rel_table WILL NOT PROVIDE as arg
-# def distance(instance, host_id, other_id, metric=None, *, p=2, w=1, rel_table=None, rel_table=None):
-def distance(instance, host_id, other_id, st, *, metric=None, p=2, w=1, rel_table=None):
+def distance_old(instance, host_id, other_id, st, *, metric=None, p=2, w=1, rel_table=None):
 
     # TODO: +add rel_table validator
     # if rel_table is None:
@@ -50,6 +48,28 @@ def distance(instance, host_id, other_id, st, *, metric=None, p=2, w=1, rel_tabl
 
     # w - MUST BE A VECTOR ??
     elif st.metric.metric_dict[metric] == 'wminkowski':
+        return __minkowski_distance(instance, host_id, other_id, p, w)
+
+
+def distance(instance, host_id, other_id):
+
+    # w - MUST BE A VECTOR !!
+    p = instance.st.metric.p
+    w = instance.st.metric.w
+
+    if instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'euclidean':
+        return __euclidean_distance(instance, host_id, other_id)
+
+    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'chebyshev':
+        return __chebyshev_distance(instance, host_id, other_id)
+
+    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'manhattan':
+        return __manhattan_distance(instance, host_id, other_id)
+
+    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'minkowski':
+        return __minkowski_distance(instance, host_id, other_id, p, w)
+
+    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'wminkowski':
         return __minkowski_distance(instance, host_id, other_id, p, w)
 
 

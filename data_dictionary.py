@@ -62,11 +62,10 @@ class DataDictionary(settings.DataDictionarySettings):
 
         # file path
         if dataset_path != r"folder\with\Objects.csv":
-            self.st.path.dataset = dataset_path.rstrip('\\') + '\\' + \
-                                   self.st.path.DEFAULT_PATH['dataset'].strip('\\\t\ ')
-                                   # self.st.path.dataset.strip('\\\t\n ')
-            self.st.path.label = dataset_path.rstrip('\\') + '\\' + \
-                                 self.st.path.DEFAULT_PATH['label'].strip('\\\t\n ')
+            self.st.path.dataset = dataset_path.rstrip('\\') + \
+                                   '\\' + self.st.path.DEFAULT_PATH['dataset'].strip('\\\t\ ')
+            self.st.path.label = dataset_path.rstrip('\\') + \
+                                 '\\' + self.st.path.DEFAULT_PATH['label'].strip('\\\t\n ')
 
         if dataset_file != r"full\path\to\the\Objects.csv": self.st.path.dataset = dataset_file
 
@@ -110,13 +109,11 @@ class DataDictionary(settings.DataDictionarySettings):
 
     # region REL_TABLE
     # REWORK rel_table.
-    def get_rel_table(self, metric=1, *_, recreate=False):
-
-        if recreate: self.create_rel_table()
+    def get_rel_table(self):
 
         return self.rel
 
-    def create_rel_table(self, metric, *_, p=None, w=None):
+    def create_rel_table_old(self, metric, *_, p=None, w=None):
         # validate
         metric = validator.metric(metric, self.st)
         p, w = validator.metric_pw(p, w, self.st)
@@ -127,8 +124,40 @@ class DataDictionary(settings.DataDictionarySettings):
         for host_id in self.ids:
             for other_idn in self.ids:
                 rel[host_id][other_idn] = \
-                    self.distance(host_id, other_idn, self.st, metric=metric, p=p, w=p)
+                    self.distance(host_id, other_idn)
 
+        self.rel = rel
+
+    def create_rel_table(self):
+        """ Creates "near_table" of all objs
+
+        3d array.
+        1st index       === returns near_table. Include deleted ids
+        2nd index       === returns row with info about <id>, <radius>, <label>. Exclude deleted ids
+        3rd index       === returns one of <id>, <radius> or <label>
+
+        :return:    rel_table
+        """
+        # <id>, <radius>, <label>
+        rel_list = []
+        for host_id in range(self.df.shape[0]):
+            near = []
+            # for other_id in range(self.df.shape[0]):
+            for other_id in self.ids:   # this exclude deleted objs (# noise,)
+                row = [other_id,
+                       self.distance(host_id, other_id),
+                       self.labels[other_id]]
+
+                # rearrange as defined in settings.rel_of
+                row[self.st.rel_of.idn], row[self.st.rel_of.radius], row[self.st.rel_of.label] = \
+                    row[0], row[1], row[2]
+                near.append(row)
+
+            near = np.array(near)
+            near = near[near[:, 1].argsort()]
+            rel_list.append(near)
+
+        rel = np.array(rel_list)
         self.rel = rel
 
     def set_rel_table(self, *_, rel_table=None, metric=None, p=None, w=None):
@@ -155,29 +184,16 @@ class DataDictionary(settings.DataDictionarySettings):
                 if w != self.st.metric.w:
                     self.st.metric.w = w
                     self.flag.metric = True
-            else:
-                metric = self.st.metric.default_metric
-                p = self.st.metric.p
-                w = self.st.metric.w
 
-            self.create_rel_table(metric=metric, p=p, w=w)
+            self.create_rel_table()
         else:
-            # need validation
+            # TODO: need validation
             self.rel = rel_table
 
-    def distance(self, host_id, other_id, st, *, metric=None, p=None, w=None, rel_table=None):
+    def distance(self, host_id, other_id):
+        return metriclib.distance(self, host_id, other_id)
 
-        if rel_table is None:
-            return metriclib.distance(
-                self, host_id, other_id, st=st, metric=metric, p=p, w=w
-            )
-        else:
-            return metriclib.distance(
-                self, host_id, other_id, st=st, metric=metric, p=p, w=w,
-                rel_table=rel_table
-            )
-
-    def get_rel_of(self, host_id, *_, rel_table=None):
+    def get_rel_of_old(self, host_id, *_, rel_table=None):
         """Returns: 2d list with like [<other_id>, <r>, <other_class>]
                 other_id    === other objects id
                 r           === distance to other object
@@ -202,21 +218,39 @@ class DataDictionary(settings.DataDictionarySettings):
         rel_of = rel_of[rel_of[:, 1].argsort()]
         return rel_of
 
-    def get_nearest_opponent(self, host_id, *_, rel_table=None):
-            """Returns: list like [<r>, <opponent_id>, <opponent_class>]
+    def get_rel_of(self, host_id):
+            """ Return near_table for host_id.
+
+            :param host_id:         any id of obj
+            :return:                2d np.array like [<other_id>, <r>, <other_class>]
+                    other_id    === other objects id
+                    r           === distance to other object
+                    other_class === other objects class
+            """
+
+            rel_of = self.rel[host_id]
+
+            # Delete host_id from near_table
+            own = np.where(rel_of[:, 0] == host_id)
+            rel_of = np.delete(rel_of, (own[0][0]), axis=0)
+
+            return rel_of
+
+    def get_nearest_opponent(self, host_id):
+            """Returns: 1d array like [<r>, <opponent_id>, <opponent_class>]
                     r              === distance to other object
                     opponent_id    === other objects id
                     opponent_class === other objects class
             """
 
-            rel_of = self.get_rel_of(host_id)
+            near = self.get_rel_of(host_id)
 
-            for row in rel_of:
-                if self.labels[host_id] != row[2]:
+            for row in near:
+                if self.labels[host_id] != row[self.st.rel_of.label]:
                     return row
             else:
                 s = f"ERROR:     dd.get_nearest_opponent(host_id={host_id})\n" \
-                    f"\tnearest_opponent not found:: rel_of({host_id})={rel_of}"
+                    f"\tnearest_opponent not found:: rel_of({host_id})={near}"
                 error_handler.write(s, self.st)
             return None
 

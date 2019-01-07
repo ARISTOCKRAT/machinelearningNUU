@@ -48,22 +48,17 @@ def get_shell(instance, st):
                 friends.add(int(row[st.rel_of.idn]))
         friends.add(host_id)
 
-        # border_file.write(f"nearest opponents id:{nearest_opponent_id}; O(Si): len={len(friends)} {friends}. ::\n")
-
         # Seeking nearest obj to nearest_opponent from host_id's friendzone
         shell_obj = [host_id, float('+inf')]
         # print(f"type: {type(nearest_opponent_id)} -- {nearest_opponent_id}; f:{friends}")
         for other_id in friends:
-            if instance.rel[nearest_opponent_id][other_id] < shell_obj[1]:
+            # if instance.rel[nearest_opponent_id][other_id] < shell_obj[1]:
+            if instance.distance(nearest_opponent_id, other_id) < shell_obj[1]:
                 shell_obj[0] = other_id
-                shell_obj[1] = instance.rel[nearest_opponent_id][other_id]
+                # shell_obj[1] = instance.rel[nearest_opponent_id][other_id]
+                shell_obj[1] = instance.distance(nearest_opponent_id, other_id)
         shell.add(shell_obj[0])
 
-        # s = f"f_id, \t\th->f, \t\tf->o, \t\tin border?\n"
-        # s = f"host_id: {host_id}; opponent:{nearest_opponent_id}; friends:{friends} \n" \
-        #     f"shell_obj: {shell_obj}" \
-        #     f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n" \
-        #     f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n\n"
         shell_file.write(
             f"\nhost_id:{host_id}; opponent:{nearest_opponent_id}; shell_id: {shell_obj[0]}; friends:{friends} \n"
             f"h->o: {instance.rel[host_id][nearest_opponent_id]}; "

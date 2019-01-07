@@ -12,6 +12,10 @@ class RelOf:
     label = 2
 
 
+class Counters:
+    border = 1
+
+
 class PathSettings:
     # project path
     project = r'd:\_NUU\2018\machine\skulls'
@@ -110,10 +114,6 @@ class DataDictionarySettings:
         self.flag = FlagSettings()
 
 
-class ErrorHandler:
-    error_file_path = r"d:\_NUU\2018\machine\skulls\output_data\error.log"
-
-
 class MetricSettings:
     default_metric = 1
     metric_dict = {
@@ -135,5 +135,5 @@ class AllSettings:
         self.metric = MetricSettings()
         self.rel_of = RelOf()
         self.path = PathSettings()
-
+        self.counter = Counters()
 
