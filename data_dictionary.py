@@ -60,7 +60,7 @@ class DataDictionary(settings.DataDictionarySettings):
 
     # region REL_TABLE
     # REWORK rel_table.
-    def get_rel_table(self, metric=1, *_, rel_table=None, recreate=False):
+    def get_rel_table(self, metric=1, *_, recreate=False):
 
         # if recreate:
         #
@@ -77,6 +77,9 @@ class DataDictionary(settings.DataDictionarySettings):
         #                 self.distance(host_id, other_idn, metric=metric, rel_table=rel_table)
         #
         # return rel
+
+        if recreate: self.rel = self.create_rel_table()
+
         return self.rel
 
     def create_rel_table(self, metric=1, *_, p=None, w=None):
@@ -127,7 +130,6 @@ class DataDictionary(settings.DataDictionarySettings):
                 other_class === other objects class
         """
 
-        rel_of = None
         rel_of = []
 
         if rel_table is None:
@@ -145,8 +147,6 @@ class DataDictionary(settings.DataDictionarySettings):
         rel_of = np.delete(rel_of, (own[0][0]), axis=0)
         rel_of = rel_of[rel_of[:, 1].argsort()]
         return rel_of
-
-    # endregion REL_TABLE
 
     def get_nearest_opponent(self, host_id, *_, rel_table=None):
             """Returns: list like [<r>, <opponent_id>, <opponent_class>]
@@ -166,6 +166,8 @@ class DataDictionary(settings.DataDictionarySettings):
                 error_handler.write(s, self.st)
             return None
 
+    # endregion REL_TABLE
+
     # region BORDER
     def set_link(self, link=None):
 
@@ -179,7 +181,7 @@ class DataDictionary(settings.DataDictionarySettings):
             return self.link[host_id]
 
     def create_border(self):
-        border, link = border_selection.get_border(self, self.st)
+        border, link = border_selection.get_border(self)
         self.border = border
         self.link = link
 

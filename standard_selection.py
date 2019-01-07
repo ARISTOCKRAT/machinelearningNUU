@@ -16,7 +16,7 @@ def get_standart_old(instance, groups, st):
     groups = instance.groups
 
     # region LOG_FILES
-    standart_file = open(st.path.standart_log, mode='w')
+    standart_file = open(st.path.standard_log, mode='w')
     standart_file.write(str(datetime.datetime.now()))
     standart_file.write("\n\n")
     standart_file.write(f"init_data:: groups: {groups}\n")
@@ -223,7 +223,7 @@ def method_nuu(instance):
     notetalons = set()                  # init values of notetalon objs
 
     # region LOG_FILES
-    standard_file = open(st.path.standart_log, mode='w')
+    standard_file = open(st.path.standard_log, mode='w')
     standard_file.write(str(datetime.datetime.now()))
     standard_file.write("\n\n")
     standard_file.write(f"init_data:: groups:\n")

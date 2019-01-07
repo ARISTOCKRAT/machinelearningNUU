@@ -2,6 +2,8 @@
 There we will select shell obj
 """
 
+import datetime
+
 # TODO: noise_selection:    add more algorithms
 
 '''
@@ -61,7 +63,7 @@ def get_noise(instance, requested_id=None, border=None):
 '''
 
 
-def get_noise(instance, st, requested_id=None, border=None):
+def get_noise(instance, st, requested_id=None):
     """ identify NOISE objects
 
     :param instance:        - instance of the DD
@@ -70,9 +72,13 @@ def get_noise(instance, st, requested_id=None, border=None):
     :return:                - 1) set of noise obj's id_number //
                               2) True/False (if id given)*
     """
+    # region LOG_FILES
+    noise_file = open(st.path.noise_log, mode='w')
+    noise_file.write(str(datetime.datetime.now()))
+    noise_file.write("\n\n")
+    # endregion LOG_FILES
 
-    if border is None:
-        border = instance.border
+    border = instance.border
 
     noise = set()
 
@@ -91,6 +97,14 @@ def get_noise(instance, st, requested_id=None, border=None):
 
             if K > L:
                 noise.add(host_id)
+                s = f'{f"S[{host_id}] is NOISE;":25} cuz {f"K({K})":8} > L({L})\n'
+                noise_file.write(s)
+            else:
+                s = f'{f"S[{host_id}] is not noise;":25} cuz {f"K({K})":8} > L({L})\n'
+                noise_file.write(s)
+
+        noise_file.write('\n' + '='*50 + '\n')
+        noise_file.write(f'noise: len:{len(noise)}\n {noise}')
 
     else:
         host_id = requested_id

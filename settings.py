@@ -20,10 +20,12 @@ class PathSettings:
 
     # log path
     border_log = r'\output_data\border.log'
+    border_after_log = r'\output_data\border.log'
+    noise_log = r'\output_data\noise.log'
     shell_log = r'\output_data\shell.log'
     error_log = r'\output_data\error.log'
     binary_log = r'\output_data\group_binary.log'
-    standart_log = r'\output_data\standart_selection.log'
+    standart_log = r'\output_data\standard_selection.log'
 
     # default path
     DEFAULT_PATH = {
@@ -33,10 +35,12 @@ class PathSettings:
         'label': r'\init_data\labels.csv',
         # log path
         'border_log': r'\output_data\border.log',
+        'border_after_log': r'\output_data\border_after_noise.log',
+        'noise_log': r'\output_data\noise.log',
         'shell_log': r'\output_data\shell.log',
         'error_log': r'\output_data\error.log',
         'binary_log': r'\output_data\group_binary.log',
-        'standart_log': r'\output_data\standart_selection.log',
+        'standard_log': r'\output_data\standard_selection.log',
     }
 
     def __init__(self):
@@ -53,10 +57,12 @@ class PathSettings:
 
         # log path
         PathSettings.border_log = project_path + PathSettings.DEFAULT_PATH['border_log']
+        PathSettings.border_after_log = project_path + PathSettings.DEFAULT_PATH['border_after_log']
+        PathSettings.noise_log = project_path + PathSettings.DEFAULT_PATH['noise_log']
         PathSettings.shell_log = project_path + PathSettings.DEFAULT_PATH['shell_log']
         PathSettings.error_log = project_path + PathSettings.DEFAULT_PATH['error_log']
         PathSettings.binary_log = project_path + PathSettings.DEFAULT_PATH['binary_log']
-        PathSettings.standart_log = project_path + PathSettings.DEFAULT_PATH['standart_log']
+        PathSettings.standard_log = project_path + PathSettings.DEFAULT_PATH['standard_log']
 
 
 class DataDictionarySettings:
@@ -146,6 +152,5 @@ class AllSettings:
         self.metric = MetricSettings()
         self.rel_of = RelOf()
         self.path = PathSettings()
-        # self.path.refactoring_path()
 
 

@@ -41,6 +41,10 @@ def get_groups(instance, st):
                 if row[st.rel_of.idn] in instance.shell:
                     binary_dict[int(row[st.rel_of.idn])].add(host_id)
 
+    binary_file.write(f"binary dict:\n")
+    for item in binary_dict.items():
+        binary_file.write(f"{item}\n")
+
     ####
     dirty = True
     while dirty:
@@ -81,6 +85,8 @@ def get_groups(instance, st):
 
     groups.sort(key=len, reverse=True)  # largest to smallest
 
+    binary_file.write("\n" + "="*50 + f'\n groups: len:{len(groups)}\n')
+    for item in groups: binary_file.write(f"{item}\n")
     return groups.copy()
 
 

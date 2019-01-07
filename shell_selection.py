@@ -11,9 +11,9 @@ def get_shell(instance, st):
     # region LOG_FILES
     # path = instance.path  # moved to st
 
-    border_file = open(st.path.border_log, mode='w')
-    border_file.write(str(datetime.datetime.now()))
-    border_file.write("\n\n")
+    # border_file = open(st.path.border_after_log, mode='w')
+    # border_file.write(str(datetime.datetime.now()))
+    # border_file.write("\n\n")
 
     shell_file = open(st.path.shell_log, mode='w')
     # shell_file = open(st.full_path['shell_log'], mode='w')
@@ -31,7 +31,7 @@ def get_shell(instance, st):
     for host_id in instance.ids:
         # DEBUG
         near = instance.get_rel_of(host_id)
-        border_file.write(f"\n:: HOST ID {host_id} near:\nid, R, label\n{near}\n")
+        # border_file.write(f"\n:: HOST ID {host_id} near:\nid, R, label\n{near}\n")
 
         # Пока я не понял зачем определять О(Si), т.к.
         # Ближайщим к оппоненту может быть объект не входящий в O(Si) НО! его игнорируем
@@ -48,7 +48,7 @@ def get_shell(instance, st):
                 friends.add(int(row[st.rel_of.idn]))
         friends.add(host_id)
 
-        border_file.write(f"nearest opponents id:{nearest_opponent_id}; O(Si): len={len(friends)} {friends}. ::\n")
+        # border_file.write(f"nearest opponents id:{nearest_opponent_id}; O(Si): len={len(friends)} {friends}. ::\n")
 
         # Seeking nearest obj to nearest_opponent from host_id's friendzone
         shell_obj = [host_id, float('+inf')]
@@ -75,6 +75,6 @@ def get_shell(instance, st):
         )
 
     shell_file.write("\n\n" + "=" * 50 + '\n\n')
-    shell_file.write(f"standard obj: {shell}")
+    shell_file.write(f"shell obj: len:{len(shell)} {shell}")
     return shell
 
