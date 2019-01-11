@@ -26,6 +26,7 @@ class PathSettings:
     # log path
     border_log = r'\output_data\border.log'
     border_after_log = r'\output_data\border.log'
+    normalize_log = r'\output_data\normalize.log'
     noise_log = r'\output_data\noise.log'
     shell_log = r'\output_data\shell.log'
     error_log = r'\output_data\error.log'
@@ -41,6 +42,7 @@ class PathSettings:
         # log path
         'border_log': r'\output_data\border.log',
         'border_after_log': r'\output_data\border_after_noise.log',
+        'normalize_log': r'\output_data\normalize.log',
         'noise_log': r'\output_data\noise.log',
         'shell_log': r'\output_data\shell.log',
         'error_log': r'\output_data\error.log',
@@ -66,6 +68,7 @@ class PathSettings:
         PathSettings.border_log = project_path + PathSettings.DEFAULT_PATH['border_log']
         PathSettings.border_after_log = project_path + PathSettings.DEFAULT_PATH['border_after_log']
         PathSettings.noise_log = project_path + PathSettings.DEFAULT_PATH['noise_log']
+        PathSettings.normalize_log = project_path + PathSettings.DEFAULT_PATH['normalize_log']
         PathSettings.shell_log = project_path + PathSettings.DEFAULT_PATH['shell_log']
         PathSettings.error_log = project_path + PathSettings.DEFAULT_PATH['error_log']
         PathSettings.binary_log = project_path + PathSettings.DEFAULT_PATH['binary_log']
@@ -121,12 +124,23 @@ class MetricSettings:
         2: "manhattan",
         3: "chebyshev",
         4: "minkowski",
+        5: "hemming",
         # 5: "wminkowski",
         # 6: "seuclidean",
         # 7: "mahalanobis"
     }
     p = 2
     w = 1  # TODO: must be a n-size vector; n = features count
+
+
+class NormalizeSettings:
+    default_normalize = 1
+    normalize_dict = {
+        1: "method1",
+        2: "method2",
+        3: "method3",
+        4: "method4",
+    }
 
 
 class AllSettings:
@@ -136,4 +150,5 @@ class AllSettings:
         self.rel_of = RelOf()
         self.path = PathSettings()
         self.counter = Counters()
+        self.normalize = NormalizeSettings()
 

@@ -60,16 +60,20 @@ def get_shell(instance, st):
         shell.add(shell_obj[0])
 
         shell_file.write(
-            f"\nhost_id:{host_id}; opponent:{nearest_opponent_id}; shell_id: {shell_obj[0]}; friends:{friends} \n"
-            f"h->o: {instance.rel[host_id][nearest_opponent_id]}; "
-            f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}; "
-            f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
+            f"\nhost_id:{host_id}; opponent:{nearest_opponent_id}; "
+            f"shell_id: {shell_obj[0]}; friends:{friends} \n"
+            # f"h->o: {instance.rel[host_id][nearest_opponent_id]}; "
+            f"h->o: {instance.distance(host_id, nearest_opponent_id)}; "
+            # f"o->f: {instance.rel[nearest_opponent_id][shell_obj[0]]}; "
+            f"o->f: {instance.distance(nearest_opponent_id, shell_obj[0])}; "
+            # f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
+            f"h->f: {instance.distance(host_id, shell_obj[0])}\n"
             f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n"
             f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n"
             f"shell:{shell}\n\n"
         )
 
     shell_file.write("\n\n" + "=" * 50 + '\n\n')
-    shell_file.write(f"shell obj: len:{len(shell)} {shell}")
+    shell_file.write(f"shell obj: len:{len(shell)}\n {shell}")
     return shell
 

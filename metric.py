@@ -4,8 +4,9 @@ There we will calculate distance
 
 # done: metric:     move distance function to this file
 # done: metric:     add at least 7 top metrics
+# done: metric:     fix, select def metric (не выбирается по умолчанию)
 # TODO: metric:     add new popular metrics
-# TODO: metric:     fix, select def metric (не выбирается по умолчанию)
+
 
 
 import validator
@@ -17,6 +18,7 @@ Metrics intended for real-valued vector spaces:
   identifier	        class name	        args	        distance function
 + “euclidean”	        EuclideanDistance	                sqrt(sum((x - y)^2))
 + “manhattan”	        ManhattanDistance                   sum(|x - y|)
++ “Hemming”             HemmingDistance                     sum(|x - y|)
 + “chebyshev”	        ChebyshevDistance                   max(|x - y|)
 + “minkowski”	        MinkowskiDistance	p	            sum(|x - y|^p)^(1/p)
 + “wminkowski”	        WMinkowskiDistance	p, w	        sum(|w * (x - y)|^p)^(1/p)
@@ -29,7 +31,6 @@ def distance_old(instance, host_id, other_id, st, *, metric=None, p=2, w=1, rel_
 
     # TODO: +add rel_table validator
     # if rel_table is None:
-    rel_table = instance.rel
 
     metric = validator.metric(metric, st)
 
@@ -63,7 +64,8 @@ def distance(instance, host_id, other_id):
     elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'chebyshev':
         return __chebyshev_distance(instance, host_id, other_id)
 
-    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'manhattan':
+    elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'manhattan' \
+        or instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'hemming':
         return __manhattan_distance(instance, host_id, other_id)
 
     elif instance.st.metric.metric_dict[instance.st.metric.default_metric] == 'minkowski':

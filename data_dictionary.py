@@ -8,6 +8,7 @@ import settings
 import validator
 import metric as metriclib
 import border_selection
+import normalize
 import error_handler
 import noise_selection
 import shell_selection
@@ -106,6 +107,12 @@ class DataDictionary(settings.DataDictionarySettings):
 
         self.set_rel_table()
         return True
+
+    def get_normalized_df(self):
+        print(
+            normalize.get_normalized_df(self)
+        )
+        ...
 
     # region REL_TABLE
     # REWORK rel_table.
