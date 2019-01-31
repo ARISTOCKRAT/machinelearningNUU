@@ -1,5 +1,6 @@
 
 import datetime
+import time
 
 # TODO: border_selection: more algorithms for border selection
 
@@ -10,6 +11,8 @@ def get_border(instance):
     :instance:          - instance of DD
     :return:            - set of border obj's id_number
     """
+
+    start_time = time.time()
 
     # region LOG_FILES
     while True:
@@ -37,7 +40,7 @@ def get_border(instance):
     for host_id in instance.ids:  # for each obj
         near = instance.get_rel_of(host_id)  # get relative table of obj
 
-        border_file.write(f"\n S[{host_id}];\t near:\n{near}\n")
+        border_file.write(f"\n S[{host_id}];\t near:\n{near[:]}\n")
 
         for row in near:          # looking for opponent on row host_id
             # if row[st.row.idn] in instanse.ids:
@@ -49,12 +52,13 @@ def get_border(instance):
         else:  # if no opponent found
             import error_handler
             s = f"ERROR:: no border obj found :: border_selection ::\n" \
-                f"\thost_id:{host_id}; row[{host_id}]:{near}\n"
+                f"\thost_id:{host_id}; row[{host_id}]:{near[:]}\n"
             error_handler.write(s, instance.st)
             border_file.write(s)
         border_file.write(f"border: {border}\n")
 
     border_file.write("\n" + '='*50 + '\n')
     border_file.write(f"border: len:{len(border)}\n{border}")
+    border_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return border.copy(), link.copy()
 

@@ -3,6 +3,7 @@ There we will select shell obj
 """
 
 import datetime
+import time
 
 # TODO: noise_selection:    add more algorithms
 
@@ -72,6 +73,7 @@ def get_noise(instance, st, requested_id=None):
     :return:                - 1) set of noise obj's id_number //
                               2) True/False (if id given)*
     """
+    start_time = time.time()
     # region LOG_FILES
     noise_file = open(st.path.noise_log, mode='w')
     noise_file.write(str(datetime.datetime.now()))
@@ -121,5 +123,6 @@ def get_noise(instance, st, requested_id=None):
             return True
         return False
 
+    noise_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return noise.copy()  # EoF get_noise()
 

@@ -134,10 +134,11 @@ class MetricSettings:
 
 
 class NormalizeSettings:
-    default_normalize = 1
+    default_normalize = 0
     normalize_dict = {
-        1: "method1",
-        2: "method2",
+        0: "nomethod",
+        1: "normalize",
+        2: "standardize",
         3: "method3",
         4: "method4",
     }

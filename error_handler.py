@@ -12,6 +12,6 @@ def write(msg, st=None, *_, file_path=None):
         # file_path =
         # file_path = settings.ErrorHandler
         # file_path = settings.ErrorHandler.error_file_path
-    with open(st.path.error_log, mode='w') as file:
+    with open(st.path.error_log, mode='a+') as file:
         s = str(datetime.datetime.now()) + "\n" + str(msg) + '\n'
         file.write(s)

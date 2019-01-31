@@ -1,13 +1,14 @@
 """
 There we will select shell obj
 """
-
+import time
 # TODO: shell_selection:    add more algorithms
 
 
 def get_shell(instance, st):
     import datetime
-
+    st = instance.st
+    start_time = time.time()
     # region LOG_FILES
     # path = instance.path  # moved to st
 
@@ -41,15 +42,16 @@ def get_shell(instance, st):
         friends = set()
         nearest_opponent_id = None
         for n, row in enumerate(near):
-            if row[st.rel_of.label] != instance.labels[host_id]:
+            if row[st.rel_of.label] == instance.labels[host_id]:
+                friends.add(int(row[st.rel_of.idn]))
+            else:
                 nearest_opponent_id = int(row[st.rel_of.idn])
                 break
-            else:
-                friends.add(int(row[st.rel_of.idn]))
         friends.add(host_id)
 
         # Seeking nearest obj to nearest_opponent from host_id's friendzone
-        shell_obj = [host_id, float('+inf')]
+        shell_obj = [host_id, instance.distance(host_id, nearest_opponent_id)]
+        # shell_obj = [-1, float('+inf')]
         # print(f"type: {type(nearest_opponent_id)} -- {nearest_opponent_id}; f:{friends}")
         for other_id in friends:
             # if instance.rel[nearest_opponent_id][other_id] < shell_obj[1]:
@@ -68,12 +70,13 @@ def get_shell(instance, st):
             f"o->f: {instance.distance(nearest_opponent_id, shell_obj[0])}; "
             # f"h->f: {instance.rel[host_id][shell_obj[0]]}\n"
             f"h->f: {instance.distance(host_id, shell_obj[0])}\n"
-            f"\nhost_rel:\n{instance.get_rel_of(host_id)}\n"
-            f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)}\n"
+            f"\nhost_rel:\n{instance.get_rel_of(host_id)[:]}\n"
+            f"\nopp_rel: \n{instance.get_rel_of(nearest_opponent_id)[:]}\n"
             f"shell:{shell}\n\n"
         )
 
     shell_file.write("\n\n" + "=" * 50 + '\n\n')
     shell_file.write(f"shell obj: len:{len(shell)}\n {shell}")
+    shell_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return shell
 

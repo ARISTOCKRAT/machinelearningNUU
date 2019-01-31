@@ -96,3 +96,55 @@ def file_exist(file_path):
     else:
         return True
 
+
+def normalize(instance, method_name):
+
+    if method_name:
+
+        # INT
+        if type(method_name) is int:
+            if instance.st.normalize.normalize_dict.get(method_name) is None:
+                error_handler.write(f"ERROR:\t unresolved method_name:: continue working as default::"
+                                    f"\n\tnormalize method({method_name}) is {type(method_name)}")
+                return instance.st.normalize.default_normalize
+            else:
+                return method_name
+
+        # FLOAT
+        elif type(method_name) is float:
+            return normalize(instance, int(method_name))
+
+        # STR
+        elif type(method_name) is str:
+            method_name = method_name.lower()
+            for item in instance.st.normalize.normalize_dict.items():
+                if method_name == item[1]:
+                    return item[0]
+            else:  # if no matches
+                error_handler.write(f"ERROR:\t out of range:: continue working as default::"
+                                    f"\n\tmethod name({method_name}) is {type(method_name)}")
+                return instance.st.normalize.default_normalize
+
+        # LIST or TUPLE
+        elif (type(method_name) is list or type(method_name) is tuple) and method_name:
+            return normalize(instance, method_name[0])
+
+        # DICT or SET
+        elif type(method_name) is dict:
+            for el in method_name.items():
+                return normalize(instance, el[1])
+        elif type(method_name) is set:
+            for el in method_name:
+                return normalize(instance, el)
+
+        # UNKNOWN type of value
+        else:
+            error_handler.write(f"ERROR:\t unresolved type of value::\n\t"
+                                f"method name ({method_name}) is {type(method_name)}")
+            return instance.st.normalize.default_normalize
+    else:
+        if method_name is None:
+            return instance.st.normalize.default_normalize
+
+    return instance.st.normalize.default_normalize
+

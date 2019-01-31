@@ -8,21 +8,20 @@ import settings
 import validator
 import metric as metriclib
 import border_selection
-import normalize
+import normalize as normalizelib
 import error_handler
 import noise_selection
 import shell_selection
 
-# TODO: data_dict: Change name of DataDict
-# TODO: data_dict: move all init_variables to setting.py
-# TODO: data_dict: move all possible functions to separate files for each
-# TODO: data_dict: change getter/setters for more intuitive understanding
-# TODO: data_dict: add more checker for datatype/valib numbers/etc
+# np.set_printoptions(threshold=10)
+
+# done: data_dict: move all init_variables to setting.py
+# done: data_dict: move all possible functions to separate files for each
+# done: data_dict: change getter/setters for more intuitive understanding
+# TODO: data_dict: add more checker for datatype/valid numbers/etc
 # TODO: data_dict: add more comments + correct __doc__ strings
-# TODO: data_dict: create UPGRADE func additional to getter/setter
 
 # TODO: data_dict\load_data:    unify input
-# TODO: data_dict\load_data:    add ability to read labels from first/last column
 # TODO: data_dict:
 
 
@@ -42,7 +41,7 @@ class DataDictionary(settings.DataDictionarySettings):
                   metric="Euclidean",  # Metric
                   p=2,  # metric
                   w=1,
-                  normalize=0,
+                  normalize=None,
                   delimiter=None,
                   ):
         """ Loading dataset
@@ -90,7 +89,8 @@ class DataDictionary(settings.DataDictionarySettings):
 
         # normalize
         if normalize:
-            pass
+            normalize = validator.normalize(self, normalize)
+            self.st.normalize.default_normalize = normalize
 
         if delimiter is None:
             delimiter = self.delimiter
@@ -106,13 +106,36 @@ class DataDictionary(settings.DataDictionarySettings):
         self.sample = self.ids.copy()
 
         self.set_rel_table()
+        if self.st.normalize.default_normalize:
+            self.normalize(normalize)
+
         return True
 
-    def get_normalized_df(self):
-        print(
-            normalize.get_normalized_df(self)
-        )
-        ...
+    # region get/set DF NORMALIZE STANDARDIZE
+    def get_df(self):
+        return self.df
+
+    def set_df(self, df):
+        # TODO: VALIDATE DF
+        self.df = df
+
+    def normalize(self, method=None):
+        method = validator.normalize(self, method)
+        self.st.normalize.default_normalize = method
+        self.df = normalizelib.get_normalized_df(self)
+
+    def set_normalized_df(self, *, normalize_df=None):
+        # TODO: add validation for normalized_df
+        if normalize_df:
+            self.set_df(df=normalize_df)
+        else:
+            self.normalize(self.st.normalize.default_normalize)
+
+    def get_normalized_df(self, method=None):
+        if method and method != self.st.normalize.default_normalize:
+            self.normalize(method=method)
+        return self.df
+    # endregion get/set DF NORMALIZE STANDARDIZE
 
     # region REL_TABLE
     # REWORK rel_table.
@@ -253,7 +276,7 @@ class DataDictionary(settings.DataDictionarySettings):
             near = self.get_rel_of(host_id)
 
             for row in near:
-                if self.labels[host_id] != row[self.st.rel_of.label]:
+                if self.labels[host_id] != int(row[self.st.rel_of.label]):
                     return row
             else:
                 s = f"ERROR:     dd.get_nearest_opponent(host_id={host_id})\n" \
