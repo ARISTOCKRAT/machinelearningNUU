@@ -47,9 +47,9 @@ def get_compactness(instance):
     compactness = list()
     m = g_compactness = 0.
 
-    labels = np.unique(instance.labels, return_counts=True)
+    labels, count = np.unique(instance.labels, return_counts=True)
 
-    for label in labels:  # for each label
+    for label in zip(labels, count):  # for each label
         label_name = label[0]   #
         mi = int(label[1])      # power of label
 
@@ -66,6 +66,7 @@ def get_compactness(instance):
     #  General compactness for all  ##############################
     ##############################################################
     compactness.append(('general', g_compactness / m))
+    # print(f"GENERAL COMPACTNESS: \n{compactness}")
 
     return compactness
 
