@@ -43,6 +43,7 @@ class DataDictionary(settings.DataDictionarySettings):
                   w=1,
                   normalize=None,
                   delimiter=None,
+                  logging=True
                   ):
         """ Loading dataset
 
@@ -55,6 +56,7 @@ class DataDictionary(settings.DataDictionarySettings):
         :param p:            arg for some metrics
         :param w:            arg for some metrics
         :param normalize:    Name or Number of normalize algorithm
+        :param logging:      True = write into log_files, False = don't write
         :return:             True === OK / None === Some Error
         """
 
@@ -76,6 +78,9 @@ class DataDictionary(settings.DataDictionarySettings):
             print(f"ERROR:  on open {self.st.path.dataset} or {self.st.path.label}")
             return
 
+        if delimiter is None:
+            delimiter = self.delimiter
+
         # metric
         metric = validator.metric(metric, self.st)
         p, w = validator.metric_pw(p, w, self.st)
@@ -92,8 +97,8 @@ class DataDictionary(settings.DataDictionarySettings):
             normalize = validator.normalize(self, normalize)
             self.st.normalize.default_normalize = normalize
 
-        if delimiter is None:
-            delimiter = self.delimiter
+        # logging
+        self.st.logging = validator.boolean(logging)
 
         # endregion VALIDATE
 

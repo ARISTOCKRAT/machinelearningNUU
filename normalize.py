@@ -24,19 +24,19 @@ def method1(instance):
     :param instance:    instance of DD
     :return:            df = dataframe
     """
-    start_time = time.time()
     df = instance.df.copy()  # dataframe === m*n size array
     m, n = df.shape
 
     # region LOG_FILES
-    normalize_file = open(instance.st.path.normalize_log, mode='w')
-    normalize_file.write(str(datetime.datetime.now()))
-    normalize_file.write("\n\n")
-
-    normalize_file.write(
-        f"normalizing with method "
-        f"{instance.st.normalize.normalize_dict[instance.st.normalize.default_normalize]}"
-        f"\n\ninitial dataframe:\n {instance.df[:]}\n")
+    log = instance.st.logging
+    start_time = time.time()
+    if log:
+        normalize_file = open(instance.st.path.normalize_log, mode='w')
+        normalize_file.write(str(datetime.datetime.now()))
+        normalize_file.write(
+            f"\n\nnormalizing with method "
+            f"{instance.st.normalize.normalize_dict[instance.st.normalize.default_normalize]}"
+            f"\n\ninitial dataframe:\n {instance.df[:]}\n")
     # endregion LOG_FILES
 
     errors = []
@@ -53,16 +53,19 @@ def method1(instance):
             for idn in range(m):
                 df[idn][feature_no] = (df[idn][feature_no] - minimum_value)
 
-        normalize_file.write(f"feature number {feature_no}, "
-                             f"max={maximum_value}, min={minimum_value}\n")
+        if log:
+            normalize_file.write(f"feature number {feature_no}, "
+                                 f"max={maximum_value}, min={minimum_value}\n")
 
     if errors:
-        normalize_file.write(f"\n::ERROR::\n")
-        for item in errors:
-            normalize_file.write(f"on feature number: {item[0]}. "
-                                 f"max={item[2]} = min={item[1]}\n")
-    normalize_file.write(f"\nnormalized dataframe:\n{df[:]}"
-                         f"\n\nTIME:: time spend: {time.time() - start_time:.3f}"
+        if log:
+            normalize_file.write(f"\n::ERROR::\n")
+            for item in errors:
+                normalize_file.write(f"on feature number: {item[0]}. "
+                                     f"max={item[2]} = min={item[1]}\n")
+    if log:
+        normalize_file.write(f"\nnormalized dataframe:\n{df[:]}"
+                             f"\n\nTIME:: time spend: {time.time() - start_time:.3f}"
                          )
 
     return df

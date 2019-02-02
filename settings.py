@@ -6,7 +6,6 @@ Here we would keep settings
 
 
 class RelOf:
-
     idn = 0
     radius = 1
     label = 2
@@ -152,4 +151,6 @@ class AllSettings:
         self.path = PathSettings()
         self.counter = Counters()
         self.normalize = NormalizeSettings()
+        self.logging = True
+
 

@@ -15,6 +15,7 @@ def get_border(instance):
     start_time = time.time()
 
     # region LOG_FILES
+    log = instance.st.logging
     while True:
         try:
             border_file = open(instance.st.path.border_log[:-4] + str(instance.st.counter.border) + '.log',
@@ -26,8 +27,9 @@ def get_border(instance):
             continue
 
     # border_file = open(st.path.border_before_log, mode='w')
-    border_file.write(str(datetime.datetime.now()))
-    border_file.write("\n\n")
+    if log:
+        border_file.write(str(datetime.datetime.now()))
+        border_file.write("\n\n")
     # endregion LOG_FILES
 
     link = dict()
@@ -40,25 +42,26 @@ def get_border(instance):
     for host_id in instance.ids:  # for each obj
         near = instance.get_rel_of(host_id)  # get relative table of obj
 
-        border_file.write(f"\n S[{host_id}];\t near:\n{near[:]}\n")
+        if log: border_file.write(f"\n S[{host_id}];\t near:\n{near[:]}\n")
 
         for row in near:          # looking for opponent on row host_id
             # if row[st.row.idn] in instanse.ids:
             if instance.labels[host_id] != int(row[instance.st.rel_of.label]):  # opponent found
                 border.add(int(row[instance.st.rel_of.idn]))  # add opponent_id into border_dict
                 link[int(row[instance.st.rel_of.idn])] += 1
-                border_file.write(f"S[{int(row[instance.st.rel_of.idn])}] now border obj\n")
+                if log: border_file.write(f"S[{int(row[instance.st.rel_of.idn])}] now border obj\n")
                 break  # stop looking for opponent
         else:  # if no opponent found
             import error_handler
             s = f"ERROR:: no border obj found :: border_selection ::\n" \
                 f"\thost_id:{host_id}; row[{host_id}]:{near[:]}\n"
             error_handler.write(s, instance.st)
-            border_file.write(s)
-        border_file.write(f"border: {border}\n")
+            if log: border_file.write(s)
+        if log: border_file.write(f"border: {border}\n")
 
-    border_file.write("\n" + '='*50 + '\n')
-    border_file.write(f"border: len:{len(border)}\n{border}")
-    border_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
+    if log:
+        border_file.write("\n" + '='*50 + '\n')
+        border_file.write(f"border: len:{len(border)}\n{border}")
+        border_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return border.copy(), link.copy()
 

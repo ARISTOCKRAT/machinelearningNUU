@@ -19,9 +19,11 @@ def get_groups(instance, st):
     start_time = time.time()
 
     # region LOG_FILES
-    binary_file = open(st.path.binary_log, mode='w')
-    binary_file.write(str(datetime.datetime.now()))
-    binary_file.write("\n\n")
+    log = instance.st.logging
+    if log:
+        binary_file = open(st.path.binary_log, mode='w')
+        binary_file.write(str(datetime.datetime.now()))
+        binary_file.write("\n\n")
     # endregion LOG_FILES
 
     binary_dict = {shell_id: {shell_id} for shell_id in instance.shell}
@@ -42,8 +44,9 @@ def get_groups(instance, st):
                 if int(row[st.rel_of.idn]) in instance.shell:
                     binary_dict[int(row[st.rel_of.idn])].add(host_id)
 
-    binary_file.write(f"binary dict:\n")
-    for item in binary_dict.items(): binary_file.write(f"{item}\n")
+    if log:
+        binary_file.write(f"binary dict:\n")
+        for item in binary_dict.items(): binary_file.write(f"{item}\n")
 
     ####
     dirty = True
@@ -83,9 +86,10 @@ def get_groups(instance, st):
 
     groups.sort(key=len, reverse=True)  # largest to smallest
 
-    binary_file.write("\n" + "="*50 + f'\n groups: len:{len(groups)}\n')
-    for item in groups: binary_file.write(f".len{len(item)} {item}\n")
-    binary_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
+    if log:
+        binary_file.write("\n" + "="*50 + f'\n groups: len:{len(groups)}\n')
+        for item in groups: binary_file.write(f".len{len(item)} {item}\n")
+        binary_file.write(f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return groups.copy()
 
 

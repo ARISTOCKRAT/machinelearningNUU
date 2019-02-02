@@ -97,6 +97,11 @@ def file_exist(file_path):
         return True
 
 
+def boolean(some_bool):
+    # TODO: create validator
+    return some_bool
+
+
 def normalize(instance, method_name):
 
     if method_name:

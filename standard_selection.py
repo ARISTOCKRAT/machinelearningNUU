@@ -150,15 +150,19 @@ def method_nuu(instance):
     notetalons = set()                  # init values of notetalon objs
 
     # region LOG_FILES
-    standard_file = open(st.path.standard_log, mode='w')
-    standard_file.write(str(datetime.datetime.now()))
-    standard_file.write("\n\n")
-    standard_file.write(f"init_data:: groups:\n")
-    for item in groups: standard_file.write(f"{str(item)} \n")
+    log = instance.st.logging
+    standard_file = None
+    if log:
+        standard_file = open(st.path.standard_log, mode='w')
+        standard_file.write(str(datetime.datetime.now()))
+        standard_file.write("\n\n")
+        standard_file.write(f"init_data:: groups:\n")
+        for item in groups: standard_file.write(f"{str(item)} \n")
 
     # handle validator
     if groups is None:
-        standard_file.write(f'DD groups not valid. groups{groups} \n')
+        if log:
+            standard_file.write(f'DD groups not valid. groups{groups} \n')
         return None
 
     # endregion LOG_FILES
@@ -181,8 +185,9 @@ def method_nuu(instance):
         indent = sorted(indent, key=lambda x: x[1], reverse=False)
         indent = [x[0] for x in indent]  # keep only ids
 
-        standard_file.write(f"\n\nchoose group:: {group}\n")
-        standard_file.write(f"Indent elements sorted by R_to_nearest_opponent:: {indent[:]}\n\n")
+        if log:
+            standard_file.write(f"\n\nchoose group:: {group}\n")
+            standard_file.write(f"Indent elements sorted by R_to_nearest_opponent:: {indent[:]}\n\n")
         # print(f"\n\nchoose group:: {group}\n")
         # print(f"Indent elements sorted by R_to_nearest_opponent:: {indent}\n\n")
 
@@ -193,73 +198,21 @@ def method_nuu(instance):
             etalons.discard(candidate_to_del)
             notetalons.add(candidate_to_del)
 
-            standard_file.write(f"\nS[{candidate_to_del}] label:{int(instance.labels[candidate_to_del])} "
-                                f"temporary deleted from etalons. \n")
+            if log:
+                standard_file.write(f"\nS[{candidate_to_del}] label:{int(instance.labels[candidate_to_del])} "
+                                    f"temporary deleted from etalons. \n")
             # print(f"S[{candidate_to_del}] temporary deleted from etalons. ")
 
             if is_correct(instance, etalons, notetalons, log_file=standard_file):
-                standard_file.write(f"\nS[{candidate_to_del}] permanently DELETED from etalons")
+                if log: standard_file.write(f"\nS[{candidate_to_del}] permanently DELETED from etalons")
             else:
-                standard_file.write(f"\nS[{candidate_to_del}] RETURNed into etalons")
                 etalons.add(candidate_to_del)
                 notetalons.discard(candidate_to_del)
-            # # CHECK for errors on change etalon_label
-            # rel_of_candidate = instance.get_rel_of(candidate_to_del)
-            # # r_to_nearest_opponent_of_candidate = instance.get_nearest_opponent(st.rel_of.radius)
-            #
-            # # looking for nearest obj to candidate
-            # # minimum: (<id of nearest obj>, <R to nearest obj>, <label of nearest obj>)
-            # minimum = (-1, float('+inf'), -1)
-            # for row in rel_of_candidate:
-            #     # if int(row[st.rel_of.idn]) in etalons:
-            #     if (row[st.rel_of.label] == instance.labels[candidate_to_del] and
-            #             int(row[st.rel_of.idn]) in etalons) or \
-            #             instance.labels[candidate_to_del] != row[st.rel_of.label]:
-            #
-            #         # Rs === Radius to nearest opponent of min.obj
-            #         Rs = instance.get_nearest_opponent(int(row[st.rel_of.idn]))[st.rel_of.radius]
-            #         # Rs_near = instance.get_rel_of(int(row[st.rel_of.idn]))
-            #         # Rs = 1
-            #
-            #         # print(f"{row[st.rel_of.radius]} / {Rs}")
-            #
-            #         local_metric = row[st.rel_of.radius] / Rs
-            #
-            #         # if row[st.rel_of.radius]:
-            #         #     local_metric = Rs / row[st.rel_of.radius]
-            #         # else:
-            #         #     local_metric = Rs
-            #
-            #         if local_metric < minimum[1]:
-            #             # DEBUG
-            #             s = f"\nrow:{row}. S[{int(row[st.rel_of.idn])}] in etalons. \t" \
-            #                 f"local_metric = {row[st.rel_of.radius]} / {Rs} = {local_metric}\n"
-            #             # print(s)
-            #             standard_file.write(s)
-            #
-            #             minimum = (row[st.rel_of.idn], local_metric, row[st.rel_of.label])
-            #     else:
-            #         # print(f"{st.rel_of.idn} not in etalons. ", end='\t')
-            #         standard_file.write(f"S[{int(row[st.rel_of.idn])}] not in etalons. \t")
-            # # we've found nearest obj to candidate
-            # # print(f"minimum: {minimum}")
-            # standard_file.write(f"\nNearest obj to the candidate is: {minimum}.\n")
-            #
-            # # check for condition 4.
-            # if instance.labels[candidate_to_del] != minimum[2]:  # if nearest obj CKt
-            #     # return candidate to the etalons
-            #     etalons.add(candidate_to_del)
-            #     notetalons.discard(candidate_to_del)
-            #
-            #     standard_file.write(f"S[{candidate_to_del}] returned to the etalons. \n\n")
-            #     # print(f"S[{candidate_to_del}] returned to the etalons. \n")   # DEBUG
-            # else:  # if nearest obj => Kt, then do nothing
-            #     standard_file.write(f"S[{candidate_to_del}] permanently deleted from etalons. \n\n")
-            #     # print(f"S[{candidate_to_del}] permanently deleted from etalons. \n")  # DEBUG
-
-    standard_file.write("\n\n" + "="*50 + '\n\n')
-    standard_file.write(f"standard obj: {etalons}"
-                        f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
+                if log: standard_file.write(f"\nS[{candidate_to_del}] RETURNed into etalons")
+    if log:
+        standard_file.write("\n\n" + "="*50 + '\n\n')
+        standard_file.write(f"standard obj: {etalons}"
+                            f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
     return etalons
 
 
@@ -401,39 +354,30 @@ def is_correct(instance, etalons, notetalons, log_file):
     :return:                1 === correct, 0 === error on test
     """
 
-    # public static int test(int metrika, int candidate, int[] etalon, int[] link, double[][] df, double[] Rs, int[] feature_types, int[] labels) {
-    #     // metrika          = 1 = euclidean, 2 = juravleva, 3 = chebyshevs
-    #     // candidate        = candidate to del from etalon list
-    #     // etalon           = 0 NOTetalon, 1 = etalon
-    #     // link             = 0 = NOTnoise, != 0 noise
-    #     // df               = data frame
-    #     // Rs               =
-    #     // feature_type     = 0 = counting, 1 = nominal
-    #     // labels
-    # // metrika, friendly_count[j], etalon, link, df, nearest_opp_ro2, feature_type, labels) == 1
-
-    ###################################################################
-    # log_file = open('path', mode='a+')   ##############################
-    ###################################################################
+    log = instance.st.logging
 
     for notetalon_id in notetalons:   # for each notetalon obj
         nearest = (-1, float('inf'))  # looking for nearest opp from etalons
-        log_file.write(f"\nchoose notetalon: {notetalon_id} ::\t ")
+        if log:
+            log_file.write(f"\nchoose notetalon: {notetalon_id} ::\t ")
 
         for etalon_id in etalons:
             Rs = instance.distance(etalon_id, notetalon_id) / instance.get_nearest_opponent(etalon_id)[1]
             if Rs < nearest[1]:  # looking for nearest opp from etalons
                 nearest = (etalon_id, Rs)
-                log_file.write(f":\t{nearest}")
+                if log:
+                    log_file.write(f":\t{nearest}")
         if nearest[0] == -1:  # if nearest obj has not found, then print error
             # DEBUG
-            log_file.write(f"ERROR: standard_selection.is_correct:: NEAREST has not found\n"
-                           f" nearest[eid][ro][nid] = {nearest} ")
+            if log:
+                log_file.write(f"ERROR: standard_selection.is_correct:: NEAREST has not found\n"
+                               f" nearest[eid][ro][nid] = {nearest} ")
             print(f"ERROR: standard_selection.is_correct:: NEAREST has not found\n"
                   f" nearest[eid][ro][nid] = {nearest} ")
         if instance.labels[nearest[0]] != instance.labels[notetalon_id]:
-            log_file.write(f"\n::correctness violeted:: nearest {nearest} "
-                           f"labels[{notetalon_id}] = {instance.labels[notetalon_id]}")
+            if log:
+                log_file.write(f"\n::correctness violeted:: nearest {nearest} "
+                               f"labels[{notetalon_id}] = {instance.labels[notetalon_id]}")
             return False
     return True
 
