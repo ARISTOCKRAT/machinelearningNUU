@@ -267,6 +267,8 @@ class DataDictionary(settings.DataDictionarySettings):
 
             # Delete host_id from near_table
             own = np.where(rel_of[:, 0] == host_id)
+            if not len(own[0]):
+                print(f"REL_OF{rel_of}; own={own}; host_id:{host_id}")
             rel_of = np.delete(rel_of, (own[0][0]), axis=0)
 
             return rel_of

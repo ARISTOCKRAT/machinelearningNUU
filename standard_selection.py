@@ -7,7 +7,10 @@ import time
 
 
 def get_standard(instance):
-    return method_nuu(instance)
+    if instance.st.logging:
+        return method_nuu_with_log(instance)
+    else:
+        return method_nuu_without_log(instance)
 
 
 # The method of National University of Uzbekistan
@@ -136,7 +139,7 @@ def method_nuu_NeedToComplete(instance):
     return etalons
 
 
-def method_nuu(instance):
+def method_nuu_longtime(instance):
 
     start_time = time.time()
 
@@ -213,6 +216,149 @@ def method_nuu(instance):
         standard_file.write("\n\n" + "="*50 + '\n\n')
         standard_file.write(f"standard obj: {etalons}"
                             f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
+    return etalons
+
+
+def method_nuu_with_log(instance):
+
+    start_time = time.time()
+
+    # sorting groups by their length. It is IMPORTANT
+    # cuz this grands us the only solution
+    groups = instance.groups.copy()  # groups
+    # groups.sort(key=len, reverse=True)  # largest to smallest
+
+    st = instance.st                    # settings
+    etalons = instance.ids.copy()       # set of id numbers
+    notetalons = set()                  # init values of notetalon objs
+
+    # region LOG_FILES
+    log = instance.st.logging
+    standard_file = None
+    if log:
+        standard_file = open(st.path.standard_log, mode='w')
+        standard_file.write(str(datetime.datetime.now()))
+        standard_file.write("\n\n")
+        standard_file.write(f"init_data:: groups:\n")
+        for item in groups: standard_file.write(f"{str(item)} \n")
+
+    # handle validator
+    if groups is None:
+        if log: standard_file.write(f'DD groups not valid. groups{groups} \n')
+        return None
+
+    # endregion LOG_FILES
+
+    # WORKING IN EACH GROUP SEPARATELY
+    for group in groups:
+
+        # create indent for each element in the group
+        indent = list()  # For list of elements ordered by R to nearest_opponent
+
+        # Sorting all elements by R_to_nearest_opponent
+        for host_id in group:
+            # indent[ <id>, <R>]:
+            #         <id>     - id of group element;
+            #         <R>      - R to nearest_element;  # for sorting
+            indent.append([
+                host_id,
+                instance.get_nearest_opponent(host_id)[st.rel_of.radius]
+            ])
+        indent = sorted(indent, key=lambda x: x[1], reverse=False)
+        indent = [x[0] for x in indent]  # keep only ids
+
+        if log:
+            standard_file.write(f"\n\nchoose group:: {group}\n"
+                                f"Indent elements sorted by R_to_nearest_opponent:: {indent[:]}\n\n")
+
+        # working in each ELEMENT of GROUP
+        for n, candidate_to_del in enumerate(indent):
+
+            # temporary delete from etalons
+            etalons.discard(candidate_to_del)
+            notetalons.add(candidate_to_del)
+
+            if log:
+                standard_file.write(f"\nS[{candidate_to_del}] label:{int(instance.labels[candidate_to_del])} "
+                                    f"temporary deleted from etalons. \n")
+            # print(f"S[{candidate_to_del}] temporary deleted from etalons. ")
+            #######################################################################
+            for notetalon_id in notetalons:  # for each notetalon obj
+                nearest = (-1, float('inf'))  # looking for nearest opp from etalons
+                if log: standard_file.write(f"\nchoose notetalon: {notetalon_id} ::\t ")
+
+                #
+                for row in instance.get_rel_of(notetalon_id):
+                    if int(row[instance.st.rel_of.idn]) in etalons:
+                        Rs = row[instance.st.rel_of.radius] / \
+                             instance.get_nearest_opponent(int(row[instance.st.rel_of.idn]))[1]
+                        if Rs < nearest[1]:
+                            nearest = (row[instance.st.rel_of.idn], Rs)
+
+                        if log: standard_file.write(f":\t{nearest}")
+                if nearest[0] == -1:  # if nearest obj has not found, then print error
+                    # DEBUG
+                    if log:
+                        standard_file.write(f"ERROR: standard_selection.is_correct:: NEAREST has not found\n"
+                                            f" nearest[eid][ro][nid] = {nearest} ")
+                        print(f"ERROR: standard_selection.is_correct:: NEAREST has not found\n"
+                              f" nearest[eid][ro][nid] = {nearest} ")
+                if instance.labels[int(nearest[0])] != instance.labels[notetalon_id]:
+                    etalons.add(candidate_to_del)
+                    notetalons.discard(candidate_to_del)
+                    if log: standard_file.write(
+                        f"\n::correctness violeted:: nearest {nearest} "
+                        f"labels[{notetalon_id}] = {instance.labels[notetalon_id]}")
+                    break
+                #     return False
+            # return True
+            #######################################################################
+            # if is_correct(instance, etalons, notetalons, log_file=standard_file):
+            #     ...
+            if log: standard_file.write(f"\nS[{candidate_to_del}] permanently DELETED from etalons")
+            # else:
+            #     etalons.add(candidate_to_del)
+            #     notetalons.discard(candidate_to_del)
+            #   # if log: standard_file.write(f"\nS[{candidate_to_del}] RETURNed into etalons")
+    if log:
+        standard_file.write("\n\n" + "="*50 + '\n\n')
+        standard_file.write(f"standard obj: {etalons}"
+                            f"\n\nTIME:: time spend: {time.time() - start_time:.3f}")
+    return etalons
+
+
+def method_nuu_without_log(instance):
+    groups = instance.groups.copy()
+
+    st = instance.st
+    etalons = instance.ids.copy()
+    notetalons = set()
+
+    for group in groups:
+        indent = list()
+        for host_id in group:
+            indent.append([
+                host_id,
+                instance.get_nearest_opponent(host_id)[st.rel_of.radius]
+                ])
+        indent = sorted(indent, key=lambda x: x[1], reverse=False)
+        indent = [x[0] for x in indent]
+
+        for n, candidate_to_del in enumerate(indent):
+            etalons.discard(candidate_to_del)
+            notetalons.add(candidate_to_del)
+            for notetalon_id in notetalons:
+                nearest = (-1, float('inf'))
+                for row in instance.get_rel_of(notetalon_id):
+                    if int(row[instance.st.rel_of.idn]) in etalons:
+                        Rs = row[instance.st.rel_of.radius] / \
+                             instance.get_nearest_opponent(int(row[instance.st.rel_of.idn]))[1]
+                        if Rs < nearest[1]:
+                            nearest = (row[instance.st.rel_of.idn], Rs)
+                if instance.labels[int(nearest[0])] != instance.labels[notetalon_id]:
+                    etalons.add(candidate_to_del)
+                    notetalons.discard(candidate_to_del)
+                    break
     return etalons
 
 
